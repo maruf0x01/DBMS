@@ -1,0 +1,2994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBMS Complete University Exam Preparation Course & Interactive Study System</title>
+<style>
+  :root {
+    --bg-main: #0a0e17;
+    --bg-card: #111827;
+    --bg-card-hover: #1f2937;
+    --bg-sidebar: #0f172a;
+    --border-color: #2d3748;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #3b82f6;
+    --accent-purple: #8b5cf6;
+    --accent-cyan: #06b6d4;
+    --accent-green: #10b981;
+    --accent-yellow: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-pink: #ec4899;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* Target element offset for smooth scrolling under sticky topbar */
+  section, .academic-card, .scroll-target {
+    scroll-margin-top: 95px;
+  }
+
+  /* Layout */
+  #app-container {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Fixed Left Sidebar with Scroll Synchronization */
+  #sidebar {
+    width: 320px;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar for sidebar */
+  #sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  #sidebar::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+  }
+
+  .sidebar-header h1 {
+    font-size: 1.25rem;
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sidebar-header p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .nav-group {
+    padding: 10px 0;
+  }
+
+  .nav-group-title {
+    padding: 8px 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-cyan);
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 20px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s, border-left-color 0.2s;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+  }
+
+  .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-left-color: var(--accent-blue);
+  }
+
+  /* Active Sidebar Synchronized State */
+  .nav-link.active {
+    color: #ffffff !important;
+    background-color: rgba(59, 130, 246, 0.18) !important;
+    border-left-color: var(--accent-blue) !important;
+    font-weight: 700 !important;
+    box-shadow: inset 3px 0 0 var(--accent-blue);
+  }
+
+  .badge-priority {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .badge-red { background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+  .badge-yellow { background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+  .badge-green { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+  /* Main Content Area */
+  #main-content {
+    margin-left: 320px;
+    flex: 1;
+    min-width: 0;
+    padding: 20px 40px 100px 40px;
+  }
+
+  /* Top Bar (Search & Mobile Toggle) */
+  .topbar {
+    position: sticky;
+    top: 0;
+    background: rgba(10, 14, 23, 0.9);
+    backdrop-filter: blur(12px);
+    padding: 16px 0;
+    z-index: 900;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .hamburger-btn {
+    display: none;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+  }
+
+  .search-wrapper {
+    flex: 1;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 16px 10px 42px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+  }
+
+  /* Academic Card Styles */
+  .academic-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 36px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+
+  .academic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    background: linear-gradient(to bottom, var(--accent-blue), var(--accent-purple));
+  }
+
+  .module-header {
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+  }
+
+  .module-tag {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-purple);
+    font-weight: 700;
+  }
+
+  .module-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 4px;
+  }
+
+  .source-meta {
+    display: inline-block;
+    background-color: rgba(59, 130, 246, 0.12);
+    color: var(--accent-cyan);
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-top: 8px;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    font-family: var(--font-mono);
+  }
+
+  /* Topic Headings */
+  h2.topic-heading {
+    font-size: 1.5rem;
+    color: #fff;
+    margin: 32px 0 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--border-color);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  h3.subtopic-heading {
+    font-size: 1.22rem;
+    color: var(--accent-cyan);
+    margin: 22px 0 12px 0;
+  }
+
+  h4.section-label {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent-blue);
+    margin: 18px 0 8px 0;
+    font-weight: 700;
+  }
+
+  p {
+    margin-bottom: 14px;
+    color: #cbd5e1;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .bangla-teaching {
+    background-color: rgba(139, 92, 246, 0.08);
+    border-left: 4px solid var(--accent-purple);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 1.02rem;
+    color: #e2e8f0;
+  }
+
+  .bangla-teaching strong {
+    color: #c084fc;
+  }
+
+  /* Callout Boxes */
+  .callout-box {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    border-left: 4px solid;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .callout-exam-alert {
+    border-color: var(--accent-red);
+    background: rgba(239, 68, 68, 0.08);
+  }
+  .callout-exam-alert .box-title { color: #f87171; }
+
+  .callout-important {
+    border-color: var(--accent-yellow);
+    background: rgba(245, 158, 11, 0.08);
+  }
+  .callout-important .box-title { color: #fbbf24; }
+
+  .callout-memory {
+    border-color: var(--accent-purple);
+    background: rgba(139, 92, 246, 0.08);
+  }
+  .callout-memory .box-title { color: #a78bfa; }
+
+  .callout-mistake {
+    border-color: #f43f5e;
+    background: rgba(244, 63, 94, 0.08);
+  }
+  .callout-mistake .box-title { color: #fb7185; }
+
+  .callout-easy {
+    border-color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.08);
+  }
+  .callout-easy .box-title { color: #34d399; }
+
+  .callout-exam-ans {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.08);
+  }
+  .callout-exam-ans .box-title { color: #60a5fa; }
+
+  .box-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Definition Block */
+  .definition-block {
+    background: #090d16;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 16px 0;
+  }
+
+  .def-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    margin-bottom: 4px;
+  }
+
+  .def-text {
+    font-size: 1.05rem;
+    font-style: italic;
+    color: #f1f5f9;
+    border-left: 3px solid var(--accent-cyan);
+    padding-left: 12px;
+    margin: 8px 0;
+  }
+
+  .def-keywords {
+    font-size: 0.85rem;
+    color: var(--accent-yellow);
+    margin-top: 6px;
+  }
+
+  /* Tables */
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    margin: 20px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+  }
+
+  table.academic-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    text-align: left;
+  }
+
+  table.academic-table th {
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 12px 16px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+  }
+
+  table.academic-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: #cbd5e1;
+    background: var(--bg-card);
+  }
+
+  table.academic-table tr:hover td {
+    background: var(--bg-card-hover);
+  }
+
+  /* Diagrams & Visuals */
+  .diagram-container {
+    background: #0b1120;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 24px 0;
+    text-align: center;
+  }
+
+  .diagram-caption {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 12px;
+    font-family: var(--font-mono);
+  }
+
+  /* Code Blocks */
+  pre.code-block {
+    background: #050811;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: #38bdf8;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+
+  code.inline-code {
+    background: #1e293b;
+    color: #38bdf8;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+  }
+
+  /* Collapsible / Active Recall */
+  .collapsible-wrapper {
+    margin: 16px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-card);
+  }
+
+  .collapsible-trigger {
+    width: 100%;
+    padding: 14px 18px;
+    background: #1e293b;
+    color: #fff;
+    border: none;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.2s;
+  }
+
+  .collapsible-trigger:hover {
+    background: #334155;
+  }
+
+  .collapsible-content {
+    display: none;
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    background: #0d1322;
+  }
+
+  .collapsible-content.open {
+    display: block;
+  }
+
+  /* Interactive Checklist */
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: background 0.2s;
+  }
+
+  .checklist-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .checklist-item input[type="checkbox"] {
+    margin-top: 5px;
+    accent-color: var(--accent-blue);
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  .checklist-label {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #e2e8f0;
+  }
+
+  .checklist-label a {
+    color: var(--accent-cyan);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .checklist-label a:hover {
+    text-decoration: underline;
+  }
+
+  /* Back to top */
+  #back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--accent-blue);
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  #back-to-top:hover {
+    transform: translateY(-3px);
+    background: #2563eb;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 992px) {
+    #sidebar {
+      transform: translateX(-100%);
+    }
+    #sidebar.mobile-open {
+      transform: translateX(0);
+    }
+    #main-content {
+      margin-left: 0;
+      padding: 16px 16px 80px 16px;
+    }
+    .hamburger-btn {
+      display: block;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="app-container">
+  <!-- FIXED LEFT SIDEBAR (SYNCHRONIZED WITH SCROLL) -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <h1>🎓 DBMS Master</h1>
+      <p>University Exam Tutoring & Revision System</p>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Exam Roadmap</div>
+      <a href="#how-to-study" class="nav-link"><span>🎯 How to Study Guide</span></a>
+      <a href="#suggestion-mapping" class="nav-link"><span>🗺️ Suggestion Priority Map</span></a>
+      <a href="#master-checklist" class="nav-link"><span>📚 Master Topic Checklist</span></a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Module 01: Introduction & Architecture</div>
+      <a href="#topic-fs-vs-dbms" class="nav-link"><span>1.1 File System vs DBMS</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-data-abstraction" class="nav-link"><span>1.2 Three Levels of Abstraction</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-ansi-sparc" class="nav-link"><span>1.3 ANSI/SPARC 3-Tier Architecture</span> <span class="badge-priority badge-yellow">🟡 MED</span></a>
+      <a href="#topic-dba-duties" class="nav-link"><span>1.4 DBA Duties & Roles</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-app-architecture" class="nav-link"><span>1.5 2-Tier vs 3-Tier Architectures</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-system-structure" class="nav-link"><span>1.6 Overall DBMS System Structure</span> <span class="badge-priority badge-yellow">🟡 MED</span></a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Module 02: ER Modeling & Conversions</div>
+      <a href="#topic-strong-vs-weak" class="nav-link"><span>2.1 Strong vs Weak Entity Set</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-er-keys" class="nav-link"><span>2.2 DBMS Keys (Super vs CK vs PK)</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-pk-vs-unique" class="nav-link"><span>2.3 Primary Key vs Unique Key</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-gen-vs-spec" class="nav-link"><span>2.4 Generalization vs Specialization</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-ternary-to-binary" class="nav-link"><span>2.5 Ternary to Binary (3 Slide Patterns)</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-er-to-tables" class="nav-link"><span>2.6 Reduction of ER to Relational Tables</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-attributes-cardinality" class="nav-link"><span>2.7 Attributes, Cardinality & Aggregation</span> <span class="badge-priority badge-green">🟢 LOW</span></a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Module 03: Relational Algebra</div>
+      <a href="#topic-select-vs-project" class="nav-link"><span>3.1 Selection (σ) vs Projection (π)</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-cartesian-product" class="nav-link"><span>3.2 Cartesian Product & Rename (ρ)</span> <span class="badge-priority badge-yellow">🟡 MED</span></a>
+      <a href="#topic-set-operations" class="nav-link"><span>3.3 Union, Difference, Intersection</span> <span class="badge-priority badge-yellow">🟡 MED</span></a>
+      <a href="#topic-joins" class="nav-link"><span>3.4 Natural Join & Outer Joins</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-ra-queries" class="nav-link"><span>3.5 Classic Exam Queries (Perryridge, Largest Balance)</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-aggregates" class="nav-link"><span>3.6 Aggregate Operations</span> <span class="badge-priority badge-yellow">🟡 MED</span></a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Module 04: SQL & Constraints</div>
+      <a href="#topic-sql-constraints" class="nav-link"><span>4.1 Table Creation with PK, NOT NULL, CHECK</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-foreign-keys" class="nav-link"><span>4.2 Foreign Keys & ON DELETE CASCADE</span> <span class="badge-priority badge-red">🔴 HIGH</span></a>
+      <a href="#topic-sql-ddl-dml" class="nav-link"><span>4.3 SQL DDL/DML Commands & Alteration</span> <span class="badge-priority badge-yellow">🟡 MED</span></a>
+      <a href="#topic-mysql-types" class="nav-link"><span>4.4 MySQL Data Types Summary</span> <span class="badge-priority badge-green">🟢 LOW</span></a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Module 05: Final Revision & Mock Exam</div>
+      <a href="#final-revision" class="nav-link"><span>🚀 Final Exam Revision & Cheat Sheet</span></a>
+      <a href="#mock-exam" class="nav-link"><span>📝 Comprehensive University Mock Exam</span></a>
+      <a href="#mock-answers" class="nav-link"><span>🏆 Detailed Model Answer Key</span></a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <button class="hamburger-btn" id="mobile-menu-btn" title="Toggle Navigation Menu">☰</button>
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="topic-search" class="search-input" placeholder="Search topics, definitions, operators (e.g. Selection, Weak Entity, Ternary, Check)..." />
+      </div>
+    </div>
+
+    <!-- ==========================================
+         STUDY STRATEGY SECTION
+         ========================================== -->
+    <section id="how-to-study" class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Pedagogical Framework</div>
+        <h2 class="module-title">🎯 How to Study This Course Efficiently</h2>
+      </div>
+      <div class="bangla-teaching">
+        <strong>শিক্ষকের বিশেষ পরামর্শ:</strong> যদি তোমার আগে থেকে কোনো প্রিপারেশন না থাকে, একদম ভয় পেয়ো না! এই কোর্সটি তৈরি করা হয়েছে এমনভাবে যেন আমি তোমার পাশে বসে প্রতিটি টপিক ধরে ধরে বুঝিয়ে দিচ্ছি। সাজেশন অনুযায়ী যেসব টপিক লাল ব্যাজ (🔴 HIGH PRIORITY) দেওয়া আছে, সেগুলো সবার আগে শেষ করবে।
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0;">
+        <div style="background: #0c1322; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="color: var(--accent-blue); font-weight: bold; margin-bottom: 6px;">ধাপ ১ — সহজ ব্যাখ্যা পড়া</div>
+          <p style="font-size: 0.88rem; margin: 0;">প্রথমে বাংলা ব্যাখ্যা ও বাস্তব উদাহরণ পড়ে ধারণাটি পরিষ্কার করে নাও ("আসলে জিনিসটা কী এবং কেন দরকার?")।</p>
+        </div>
+        <div style="background: #0c1322; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="color: var(--accent-purple); font-weight: bold; margin-bottom: 6px;">ধাপ ২ — চিত্র/ডায়াগ্রাম আয়ত্ত করা</div>
+          <p style="font-size: 0.88rem; margin: 0;">প্রতিটি আর্কিটেকচার, ই-আর ডায়াগ্রাম এবং রিলেশনাল টেবিল ম্যাপিং মনোযোগ দিয়ে লক্ষ্য করো।</p>
+        </div>
+        <div style="background: #0c1322; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="color: var(--accent-yellow); font-weight: bold; margin-bottom: 6px;">ধাপ ৩ — এক্সাম ডেফিনিশন ও কি-ওয়ার্ড</div>
+          <p style="font-size: 0.88rem; margin: 0;">অরিজিনাল স্লাইডের ইংরেজি সংজ্ঞা ও কি-ওয়ার্ডগুলো খাতায় লিখে মুখস্থ করে ফেলো।</p>
+        </div>
+        <div style="background: #0c1322; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="color: var(--accent-green); font-weight: bold; margin-bottom: 6px;">ধাপ ৪ — প্র্যাকটিস ও একটিভ রিকল</div>
+          <p style="font-size: 0.88rem; margin: 0;">অ্যানসার দেখার আগে নিজে চেষ্টা করো, তারপর "Show Model Answer" ক্লিক করে মিলিয়ে নাও।</p>
+        </div>
+      </div>
+
+      <div class="callout-box callout-important">
+        <div class="box-title">⚡ STUDY PRIORITY RULE</div>
+        <p style="margin: 0; font-size: 0.92rem;">
+          <strong>🔴 HIGH PRIORITY:</strong> সাজেশনের সরাসরি টপিকসমূহ (File System vs DBMS, 3 Levels, 2-Tier vs 3-Tier, DBA Duties, PK vs Unique, Super Key vs CK, Strong vs Weak, Generalization vs Specialization, Ternary to Binary 3 slides, ER to Tables, Selection vs Projection, SQL Table Create with Constraints, Relational Algebra Queries)। এগুলো পরীক্ষায় সর্বোচ্চ নম্বর নিশ্চিত করবে!<br>
+          <strong>🟡 MEDIUM PRIORITY:</strong> ANSI/SPARC, Overall System Structure, Relational Algebra Joins & Set Ops, SQL Alter/Drop.<br>
+          <strong>🟢 LOW PRIORITY:</strong> MySQL Data Types details, Attributes classification details (সাজেশনে "Attribute name -> less important" স্পষ্টভাবে চিহ্নিত)।
+        </p>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SUGGESTION TO SLIDE MAPPING TABLE
+         ========================================= -->
+    <section id="suggestion-mapping" class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Syllabus Alignment</div>
+        <h2 class="module-title">🗺️ Suggestion-to-Source Comprehensive Mapping</h2>
+      </div>
+      <p>নিচের ম্যাপিং টেবিলটিতে সাজেশনের প্রতিটি টপিক আমাদের ৪টি মূল লেকচার পিডিএফ-এর কোন পেজ/স্লাইড থেকে এসেছে এবং তার পরীক্ষার গুরুত্ব বিশদভাবে উল্লেখ করা হলো:</p>
+
+      <div class="table-responsive">
+        <table class="academic-table">
+          <thead>
+            <tr>
+              <th>Suggestion Topic</th>
+              <th>Source PDF & Location</th>
+              <th>What to Specifically Study for Exam</th>
+              <th>Priority</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>File System vs DBMS</strong></td>
+              <td><code>1.1Introduction.pdf</code> (Pages 3–4)</td>
+              <td>7 major drawbacks of File Systems (Redundancy, Inconsistency, Difficulty accessing data, Data isolation, Integrity problems, Atomicity issues, Concurrency anomalies, Security problems).</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Abstract Level (Data Abstraction)</strong></td>
+              <td><code>1.1Introduction.pdf</code> (Pages 5–8)</td>
+              <td>Physical Level (how data is stored), Logical/Conceptual Level (what data & relationships exist), View Level (application/user views). Standard 3-level diagram.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>DBA Duty</strong></td>
+              <td><code>1.1Introduction.pdf</code> (Page 15)</td>
+              <td>7 official duties: Schema definition, Storage structure & access methods, Schema & physical modification, Granting authorizations, Specifying integrity constraints, Liaison with users, Performance monitoring.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Application Architecture</strong></td>
+              <td><code>1.1Introduction.pdf</code> (Page 18)</td>
+              <td>Two-tier (Client + DB Server via ODBC/JDBC) vs Three-tier (Client + App Server/Middleware + DB Server). Architecture diagrams.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>PK vs Unique Key</strong></td>
+              <td><code>Corrected_MySQL.pdf</code> (Pages 22–24) & <code>2nd Chapter-1.pdf</code> (Page 6, 9)</td>
+              <td>Primary Key cannot accept NULL, only 1 PK per table, creates clustered index. Unique Key allows NULL, multiple unique keys allowed.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Super Key vs Candidate Key (CK)</strong></td>
+              <td><code>2nd Chapter-1.pdf</code> (Pages 8, 13–14)</td>
+              <td>Super key: any attribute set uniquely identifying a tuple. Candidate key: Minimal super key with no redundant attributes. Formulas, subset rule, and Employee table example.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Strong Entity Set vs Weak Entity Set</strong></td>
+              <td><code>2nd Chapter-1.pdf</code> (Pages 1, 23, 34)</td>
+              <td>Strong entity has PK, single rectangle. Weak entity lacks PK, depends on identifying entity via identifying relationship (double diamond), has discriminator (dashed underline), double rectangle.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Generalization vs Specialization</strong></td>
+              <td><code>2nd Chapter-1.pdf</code> (Pages 25–26)</td>
+              <td>Specialization = Top-down (ISA triangle, attribute inheritance). Generalization = Bottom-up. Constraints: Disjoint vs Overlapping, Total vs Partial completeness.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Ternary to Binary (3 Slide Patterns)</strong></td>
+              <td><code>2nd Chapter-1.pdf</code> (Pages 22, 39, 40, 41, 42)</td>
+              <td>Slide 39: Supplier-Part-Project via weak entity Supply. Slide 40: Technician-Project-Notebook via binary decomposition. Slide 41: Sales Assistant-Customer-Product via entity Sale.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>ER to Relational Table Reduction</strong></td>
+              <td><code>2nd Chapter-1.pdf</code> (Pages 32–36)</td>
+              <td>Reducing Strong entities, Weak entities, Composite attributes, Multivalued attributes (separate table), M:N relationships, 1:M relationships (foreign key on many side).</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Selection (σ) vs Projection (π)</strong></td>
+              <td><code>3.Relational_Aljebra.pdf</code> (Pages 2–4)</td>
+              <td>Selection: Horizontal subset (selects tuples matching predicate). Projection: Vertical subset (eliminates columns, removes duplicate tuples). Syntax, symbols, and examples.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Relational Algebra Queries</strong></td>
+              <td><code>3.Relational_Aljebra.pdf</code> (Pages 5–22)</td>
+              <td>Banking queries: Loan > 1200, Perryridge branch loan customers, Union of borrower and depositor, Set difference, Cartesian product + Selection composition, Natural Join, Largest balance query.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Table Creation with Constraints (PK, NOT NULL, CHECK)</strong></td>
+              <td><code>Corrected_MySQL.pdf</code> (Pages 20–28)</td>
+              <td>DDL syntax combining PRIMARY KEY, NOT NULL, and CHECK constraints (e.g. BETWEEN, LIKE 'A%', balance > 0) in one table creation script.</td>
+              <td><span class="badge-priority badge-red">🔴 HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>ANSI/SPARC 3-Tier Architecture</strong></td>
+              <td><code>1.1Introduction.pdf</code> (Page 9)</td>
+              <td>External, Conceptual, and Internal levels with E/C and C/I mappings. Logical and Physical Data Independence.</td>
+              <td><span class="badge-priority badge-yellow">🟡 MED</span></td>
+            </tr>
+            <tr>
+              <td><strong>Overall DBMS System Structure</strong></td>
+              <td><code>1.1Introduction.pdf</code> (Pages 16–17)</td>
+              <td>Query Processor (DDL interpreter, DML compiler, query evaluation engine), Storage Manager (buffer, file, auth/integrity, transaction managers), Disk Storage.</td>
+              <td><span class="badge-priority badge-yellow">🟡 MED</span></td>
+            </tr>
+            <tr>
+              <td><strong>Attribute Types (Simple, Composite, Derived, Multivalued)</strong></td>
+              <td><code>2nd Chapter-1.pdf</code> (Page 2)</td>
+              <td>Marked in suggestion as "less important". Quick revision of simple, composite, derived, single/multivalued, null-valued.</td>
+              <td><span class="badge-priority badge-green">🟢 LOW</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         MASTER TOPIC CHECKLIST
+         ========================================== -->
+    <section id="master-checklist" class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Self-Paced Progress Tracker</div>
+        <h2 class="module-title">📚 Complete Exam Preparation Checklist</h2>
+      </div>
+      <p>পড়া শেষ হলে নিচের চেকবক্সগুলোতে টিক দিয়ে তোমার প্রোগ্রেস ট্র্যাক করো (ডেটা ব্রাউজারের মেমোরিতে অটো-সেভ থাকবে):</p>
+
+      <div id="checklist-container">
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-1" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-fs-vs-dbms">File System vs DBMS (Differences & 7 File System Drawbacks)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-2" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-data-abstraction">Three Levels of Data Abstraction (Physical, Logical, View)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-3" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-dba-duties">Database Administrator (DBA) Major Duties & Responsibilities</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-4" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-app-architecture">Application Architectures (Two-Tier vs Three-Tier Client-Server)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-5" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-strong-vs-weak">Strong Entity Set vs Weak Entity Set (Discriminator, Identifying Relationship)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-6" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-er-keys">DBMS Keys: Super Key vs Candidate Key (CK) Minimal Property</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-7" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-pk-vs-unique">Primary Key vs Unique Key (Differences & NULL Handling)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-8" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-gen-vs-spec">Generalization vs Specialization (Top-down vs Bottom-up, ISA, Constraints)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-9" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-ternary-to-binary">Ternary to Binary Relationship Conversion (All 3 Slide Examples: Supply, Technician, Sale)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-10" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-er-to-tables">Reduction of ER Diagram to Relational Tables (Entities, Multivalued, M:N, 1:M)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-11" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-select-vs-project">Relational Algebra: Selection (σ) vs Projection (π)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-12" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-ra-queries">Relational Algebra Classic Queries (Perryridge Branch Loan, Largest Balance Query)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-13" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-red">🔴 MUST STUDY</span>
+            <a href="#topic-sql-constraints">SQL Table Creation using PK, NOT NULL, and CHECK Constraints</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-14" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-yellow">🟡 IMPORTANT</span>
+            <a href="#topic-ansi-sparc">ANSI/SPARC 3-Tier Architecture & Data Independence</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-15" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-yellow">🟡 IMPORTANT</span>
+            <a href="#topic-system-structure">DBMS Overall System Structure (Query Processor + Storage Manager)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-16" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-yellow">🟡 IMPORTANT</span>
+            <a href="#topic-joins">Relational Algebra Joins (Natural Join, Outer Joins with NULLs)</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-17" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-yellow">🟡 IMPORTANT</span>
+            <a href="#topic-foreign-keys">Foreign Key Rules & ON DELETE CASCADE Implementation</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-18" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-green">🟢 QUICK REVISION</span>
+            <a href="#topic-attributes-cardinality">Attributes Classification, Domain & Cardinality Constraints</a>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" id="chk-19" onchange="saveChecklist()" />
+          <div class="checklist-label">
+            <span class="badge-priority badge-green">🟢 QUICK REVISION</span>
+            <a href="#topic-mysql-types">MySQL Data Types & ALTER / DROP Commands Overview</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         MODULE 01: INTRODUCTION, PURPOSE, ABSTRACTION & ARCHITECTURES
+         ========================================================================== -->
+    <div class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Module 01</div>
+        <h2 class="module-title">Database System Foundations & Architectures</h2>
+        <div class="source-meta">Primary Source: 1.1Introduction.pdf (Pages 1–18)</div>
+      </div>
+
+      <!-- 1.1 File System vs DBMS -->
+      <section id="topic-fs-vs-dbms">
+        <h2 class="topic-heading">
+          <span>1.1 File System vs Database Management System (DBMS)</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনের শুরুর টপিক: <em>"file system vs DBMS (Different) characteristic"</em>। প্রতি বছর এখান থেকে সরাসরি পার্থক্য বা ফাইল সিস্টেমের সীমাবদ্ধতা (Drawbacks of File Systems) ৫ থেকে ৮ নম্বরের প্রশ্ন হিসেবে আসে।</p>
+        </div>
+
+        <h4 class="section-label">সহজ বাংলায় কনসেপ্ট (Beginner Explanation)</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি জিনিসটা আসলে কী:</strong><br>
+          আগেকার দিনে কম্পিউটারে ডেটা রাখা হতো সাধারণ ফাইল বা এক্সেল ফাইলের মতো টেক্সট ফাইলে। যেমন ধরো, ভার্সিটির একাউন্টস সেকশন স্টুডেন্টের নামের তালিকা একটা ফাইলে রাখল, আবার লাইব্রেরি সেকশন আরেকটা ফাইলে রাখল।<br>
+          এখন সমস্যা কী?<br>
+          ১. একাউন্টসে ফোন নম্বর আপডেট করলে লাইব্রেরির ফাইলে তা পুরনোই থেকে গেল (Data Inconsistency)।<br>
+          ২. একই নাম দুই ফাইলে বারবার লেখা হলো (Data Redundancy)।<br>
+          ৩. ব্যাংক একাউন্ট থেকে টাকা ট্রান্সফারের সময় মাঝপথে বিদ্যুৎ চলে গেলে একাউন্ট থেকে টাকা কাটবে কিন্তু অন্য একাউন্টে জমা হবে না (Atomicity Problem)।<br>
+          <strong>DBMS হলো এমন এক সেন্ট্রালাইজড সফটওয়্যার</strong>, যা এই সব সমস্যার স্থায়ী সমাধান করে ডেটাকে সুরক্ষিত, নিখুঁত এবং একই সাথে হাজার হাজার ইউজারের জন্য ব্যবহারযোগ্য রাখে।
+        </div>
+
+        <div class="definition-block">
+          <div class="def-tag">Formal Definition (Source: 1.1Introduction.pdf, Page 2)</div>
+          <div class="def-text">
+            "A Database Management System (DBMS) consists of a collection of interrelated data and a set of programs to access that data. DBMS provides an environment that is both convenient and efficient to use."
+          </div>
+          <div class="def-keywords">Key Terms to Remember: Interrelated data, Access programs, Convenient, Efficient, Enterprise information.</div>
+        </div>
+
+        <h4 class="section-label">স্লাইড অনুযায়ী ফাইল সিস্টেমের ৭টি মারাত্মক সীমাবদ্ধতা (Drawbacks of File Systems)</h4>
+        <p>Source Material (1.1Introduction.pdf, Pages 3–4) অনুযায়ী ফাইল সিস্টেমের মূল সমস্যাগুলো নিম্নরূপ:</p>
+        
+        <ol style="margin-left: 20px; color: #cbd5e1; margin-bottom: 16px;">
+          <li style="margin-bottom: 8px;"><strong>Data Redundancy and Inconsistency:</strong> Multiple file formats and duplication of information across different files lead to higher storage costs and conflicting data when updates happen.</li>
+          <li style="margin-bottom: 8px;"><strong>Difficulty in Accessing Data:</strong> Users must write a brand-new application program to carry out every newly requested task or ad-hoc query.</li>
+          <li style="margin-bottom: 8px;"><strong>Data Isolation:</strong> Because data is scattered in various files with different formats, writing new application programs to retrieve matching data is extremely difficult.</li>
+          <li style="margin-bottom: 8px;"><strong>Integrity Problems:</strong> Integrity constraints (e.g., <code>account_balance > 0</code>) become hardcoded directly inside program code. It is very hard to add new constraints or modify existing ones.</li>
+          <li style="margin-bottom: 8px;"><strong>Atomicity of Updates:</strong> Failures (power cut, OS crash) may leave the database in an inconsistent state with partial updates carried out. (e.g., Transfer of funds must either complete 100% or not happen at all — "All-or-Nothing").</li>
+          <li style="margin-bottom: 8px;"><strong>Concurrent Access Anomalies:</strong> Uncontrolled concurrent access by multiple users reading and updating the exact same record at the same time leads to corrupted, inconsistent data.</li>
+          <li style="margin-bottom: 8px;"><strong>Security Problems:</strong> Enforcing granular access control (e.g., financial clerk seeing balance but not manager passwords) is extremely hard in traditional file systems.</li>
+        </ol>
+
+        <!-- Comparison Table -->
+        <h4 class="section-label">Exam Comparison Table: File System vs DBMS</h4>
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Feature / Dimension</th>
+                <th>File Processing System</th>
+                <th>Database Management System (DBMS)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Data Redundancy</strong></td>
+                <td>High; multiple copies of identical data exist in separate files.</td>
+                <td>Minimal; centralized storage and relationships prevent duplication.</td>
+              </tr>
+              <tr>
+                <td><strong>Data Consistency</strong></td>
+                <td>Low; updating one file leaves other files with outdated, conflicting data.</td>
+                <td>High; centralized updates ensure consistent state throughout.</td>
+              </tr>
+              <tr>
+                <td><strong>Data Access</strong></td>
+                <td>Difficult; requires writing custom code in C/C++/Java for each new query.</td>
+                <td>Easy & Efficient; standardized query language (SQL / Relational Algebra).</td>
+              </tr>
+              <tr>
+                <td><strong>Data Independence</strong></td>
+                <td>Absent; file format tightly coupled to application program logic.</td>
+                <td>Present; Physical and Logical data independence supported.</td>
+              </tr>
+              <tr>
+                <td><strong>Integrity Constraints</strong></td>
+                <td>Hardcoded inside application code; very difficult to change.</td>
+                <td>Declared centrally in DB schema via DDL (<code>NOT NULL</code>, <code>CHECK</code>, <code>PRIMARY KEY</code>).</td>
+              </tr>
+              <tr>
+                <td><strong>Atomicity & Crash Recovery</strong></td>
+                <td>Difficult to guarantee; partial updates leave files corrupted.</td>
+                <td>Guaranteed by Transaction Manager via logging and rollback mechanisms.</td>
+              </tr>
+              <tr>
+                <td><strong>Concurrency Control</strong></td>
+                <td>Limited or no concurrency control; simultaneous writes corrupt data.</td>
+                <td>Sophisticated concurrency control manager (locking, timestamps) prevents anomalies.</td>
+              </tr>
+              <tr>
+                <td><strong>Security & Authorization</strong></td>
+                <td>Simple OS file-level permissions; cannot restrict specific columns/rows.</td>
+                <td>Granular views and role-based permissions at table, row, and column level.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-box callout-memory">
+          <div class="box-title">🧠 MEMORY TRICK — 7 DRAWBACKS OF FILE SYSTEM</div>
+          <p style="margin:0;">মনে রাখার শর্টকাট নেমোনিক: <strong>"R-I-D-I-A-C-S"</strong><br>
+          <strong>R</strong> = Redundancy & Inconsistency | <strong>I</strong> = Isolation of data | <strong>D</strong> = Difficulty in accessing data | <strong>I</strong> = Integrity problems | <strong>A</strong> = Atomicity issues | <strong>C</strong> = Concurrent access anomalies | <strong>S</strong> = Security problems.</p>
+        </div>
+
+        <!-- Practice & Model Answer -->
+        <div class="collapsible-wrapper">
+          <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+            <span>📝 Practice Questions & Model Exam Answer: File System vs DBMS</span>
+            <span>▼</span>
+          </button>
+          <div class="collapsible-content">
+            <p><strong>Q1: Why is atomicity important in database transactions? Give an example from banking.</strong></p>
+            <div class="callout-box callout-exam-ans">
+              <div class="box-title">Model Answer for Exam</div>
+              <p><strong>Definition:</strong> Atomicity is the "all-or-nothing" property of a transaction, ensuring that either all operations of the transaction are executed successfully or none are.<br>
+              <strong>Why Needed:</strong> If a system crash occurs midway through an execution, the database must not be left in a partially updated, inconsistent state.<br>
+              <strong>Banking Example (from PDF 1, Page 4):</strong> Suppose Customer A transfers $500 to Customer B. This involves two steps: (1) Deduct $500 from Account A, and (2) Add $500 to Account B. If power fails immediately after step 1, Account A loses $500 while Account B never receives it. A DBMS guarantees atomicity by rolling back step 1, leaving the database completely consistent.</p>
+            </div>
+
+            <p style="margin-top: 14px;"><strong>Q2: How does a DBMS handle integrity constraints compared to a traditional file system?</strong></p>
+            <div class="callout-box callout-exam-ans">
+              <div class="box-title">Model Answer for Exam</div>
+              <p>In a file processing system, integrity constraints (e.g., <code>balance > 0</code>) are hardcoded inside individual application programs. If a new business constraint is added, programmers must locate and modify every application program accessing those files. In contrast, a DBMS enforces integrity constraints centrally within the database schema using DDL statements (e.g., <code>CHECK(balance > 0)</code>). The DBMS engine automatically validates all incoming insert/update operations regardless of which application submits them.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1.2 Three Levels of Data Abstraction -->
+      <section id="topic-data-abstraction">
+        <h2 class="topic-heading">
+          <span>1.2 Three Levels of Data Abstraction</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে স্পষ্টভাবে চিহ্নিত: <em>"Abstract level"</em>। পরীক্ষায় "Explain the 3 levels of data abstraction with an appropriate architecture diagram" প্রশ্নটি প্রায় নিশ্চিতভাবে আসে।</p>
+        </div>
+
+        <h4 class="section-label">সহজ ভাষায় কনসেপ্ট (Beginner Explanation)</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি জিনিসটা আসলে কী:</strong><br>
+          তুমি যখন কোনো ব্যাংকের অ্যাপে ঢুকো, তুমি শুধু তোমার নাম আর একাউন্ট ব্যালেন্স দেখতে পাও (View Level)। তুমি কিন্তু দেখতে পাও না ব্যাংকের মূল ডেটাবেজের টেবিলে আর কী কী ফিল্ড বা অন্যান্য কাস্টমারের তথ্য আছে (Logical Level)। আর সেই ডেটা হার্ডডিস্কের কোন মেমোরি ব্লকে, কোন B-Tree ইনডেক্সে বাইনারি আকারে রাখা আছে—তাও তোমার জানার দরকার নেই (Physical Level)।<br>
+          এই যে অপ্রয়োজনীয় টেকনিক্যাল জটিলতা গোপন রেখে ইউজারকে সহজ ইন্টারফেস দেওয়া—একেই বলে <strong>Data Abstraction</strong>!
+        </div>
+
+        <div class="definition-block">
+          <div class="def-tag">Formal Definition (Source: 1.1Introduction.pdf, Page 5)</div>
+          <div class="def-text">
+            "A major aim of a DBMS is to provide users with an abstract view of data. Data Abstraction hides certain details of how the data are stored and maintained, using several levels of abstraction to simplify users' interaction with the system."
+          </div>
+          <div class="def-keywords">Key Terms: Hide complex storage details, Levels of abstraction, Physical level, Logical level, View level.</div>
+        </div>
+
+        <h4 class="section-label">Detailed Explanation of the 3 Levels (Source: 1.1Introduction.pdf, Page 6)</h4>
+        <ul style="margin-left: 20px; color: #cbd5e1; margin-bottom: 16px;">
+          <li style="margin-bottom: 12px;">
+            <strong>1. Physical Level (Lowest Level):</strong>
+            Describes <em>how</em> a record is actually stored physically on storage media (e.g. magnetic disk, SSD). It involves complex low-level data structures, file organizations, block sizes, and access paths (record offsets, B+ trees, hashing).
+          </li>
+          <li style="margin-bottom: 12px;">
+            <strong>2. Logical / Conceptual Level (Middle Level):</strong>
+            Describes <em>what</em> data are stored in the entire database and <em>what relationships</em> exist among those data. The entire database is described in terms of relatively simpler logical structures (e.g., relations, schemas, records). Database Administrators (DBAs) work at this level to decide what information to maintain.
+            <div style="background: #050811; padding: 8px 12px; border-radius: 6px; margin-top: 6px; font-family: var(--font-mono); font-size: 0.85rem; color: #a5b4fc;">
+              type customer = record<br>
+              &nbsp;&nbsp;name: string;<br>
+              &nbsp;&nbsp;street: string;<br>
+              &nbsp;&nbsp;city: string;<br>
+              end;
+            </div>
+          </li>
+          <li style="margin-bottom: 12px;">
+            <strong>3. View Level / External Level (Highest Level):</strong>
+            Describes only part of the entire database relevant to a specific group of users. Many distinct views can exist for the same database. Application programs hide implementation details and security-sensitive information (e.g., hiding staff salaries from clerical workers).
+          </li>
+        </ul>
+
+        <!-- SVG Architecture Diagram for 3 Levels -->
+        <div class="diagram-container">
+          <svg viewBox="0 0 700 360" style="max-width: 100%; height: auto; font-family: sans-serif;">
+            <!-- Background rect -->
+            <rect x="10" y="10" width="680" height="340" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+            
+            <!-- View Level Container -->
+            <rect x="40" y="30" width="620" height="90" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 2" />
+            <text x="55" y="52" fill="#93c5fd" font-weight="bold" font-size="13">VIEW LEVEL (External Level — Multiple Views)</text>
+            
+            <!-- View Boxes -->
+            <rect x="70" y="65" width="140" height="42" rx="6" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5" />
+            <text x="140" y="91" fill="#c7d2fe" font-size="13" font-weight="bold" text-anchor="middle">View 1 (Teller)</text>
+
+            <rect x="280" y="65" width="140" height="42" rx="6" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5" />
+            <text x="350" y="91" fill="#c7d2fe" font-size="13" font-weight="bold" text-anchor="middle">View 2 (Manager)</text>
+
+            <rect x="490" y="65" width="140" height="42" rx="6" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5" />
+            <text x="560" y="91" fill="#c7d2fe" font-size="13" font-weight="bold" text-anchor="middle">View n (Customer)</text>
+
+            <!-- Arrows to Logical -->
+            <path d="M 140 107 L 140 145 L 350 145 L 350 160" fill="none" stroke="#60a5fa" stroke-width="2" />
+            <path d="M 350 107 L 350 160" fill="none" stroke="#60a5fa" stroke-width="2" />
+            <path d="M 560 107 L 560 145 L 350 145" fill="none" stroke="#60a5fa" stroke-width="2" />
+
+            <!-- Logical Level Box -->
+            <rect x="180" y="160" width="340" height="58" rx="8" fill="#042f2e" stroke="#14b8a6" stroke-width="2" />
+            <text x="350" y="186" fill="#5eead4" font-size="14" font-weight="bold" text-anchor="middle">LOGICAL LEVEL (Conceptual Schema)</text>
+            <text x="350" y="204" fill="#99f6e4" font-size="11" text-anchor="middle">Describes what data is stored & relationships (Single Schema)</text>
+
+            <!-- Arrow Logical to Physical -->
+            <line x1="350" y1="218" x2="350" y2="260" stroke="#14b8a6" stroke-width="2" />
+
+            <!-- Physical Level Box -->
+            <rect x="200" y="260" width="300" height="54" rx="8" fill="#450a0a" stroke="#ef4444" stroke-width="2" />
+            <text x="350" y="284" fill="#fca5a5" font-size="14" font-weight="bold" text-anchor="middle">PHYSICAL LEVEL (Physical Schema)</text>
+            <text x="350" y="302" fill="#fecaca" font-size="11" text-anchor="middle">Describes how records are stored on disk / data structures</text>
+          </svg>
+          <div class="diagram-caption">Figure 1.1: Recreated Architecture of the Three Levels of Data Abstraction (Source: 1.1Introduction.pdf, Page 7)</div>
+        </div>
+
+        <div class="callout-box callout-exam-ans">
+          <div class="box-title">📝 HOW TO ANSWER "LEVELS OF ABSTRACTION" IN EXAM</div>
+          <p style="margin:0;">
+            ১. <strong>Definition:</strong> প্রথমে Data Abstraction এর সংজ্ঞা দাও (Hiding lower-level implementation details from users).<br>
+            ২. <strong>Diagram:</strong> উপরের ৩-স্তরের আর্কিটেকচার ডায়াগ্রামটি স্পষ্টভাবে আঁকো (View Level -> Logical Level -> Physical Level)।<br>
+            ৩. <strong>Three Sections:</strong> প্রতিটি স্তরের নাম, কী বর্ণনা করে (Physical = "How", Logical = "What", View = "Subsets/Security"), এবং সংশ্লিষ্ট ইউজার শ্রেণি (End users, DBAs, System developers) পয়েন্ট আকারে লেখো।
+          </p>
+        </div>
+      </section>
+
+      <!-- 1.3 ANSI/SPARC 3-Tier Architecture & Data Independence -->
+      <section id="topic-ansi-sparc">
+        <h2 class="topic-heading">
+          <span>1.3 ANSI/SPARC Architecture & Data Independence</span>
+          <span class="badge-priority badge-yellow">🟡 MEDIUM PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: 1.1Introduction.pdf (Pages 9–11)</div>
+
+        <p>১৯৭৫ সালে <strong>ANSI/SPARC (American National Standards Institute - Standards Planning and Requirements Committee)</strong> ৩-টিয়ার ডেটাবেজ আর্কিটেকচার প্রস্তাব করে। এর প্রধান উদ্দেশ্য ছিল <strong>Data Independence</strong> অর্জন করা।</p>
+
+        <h4 class="section-label">Mappings in ANSI/SPARC Architecture</h4>
+        <ul style="margin-left: 20px; color: #cbd5e1; margin-bottom: 16px;">
+          <li><strong>External/Conceptual (E/C) Mapping:</strong> Relates each external view to the global conceptual schema. It defines how a specific user view is derived from the conceptual schema.</li>
+          <li><strong>Conceptual/Internal (C/I) Mapping:</strong> Relates the conceptual schema to the internal (physical) storage schema. It defines how logical entities and fields map to disk storage blocks and file records.</li>
+        </ul>
+
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Type of Data Independence</th>
+                <th>Definition & Core Concept</th>
+                <th>Where Mapping Occurs</th>
+                <th>Exam Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Physical Data Independence (PDI)</strong></td>
+                <td>The ability to modify the physical schema (storage structures, indexing, file organization) without requiring changes to the logical/conceptual schema or application programs.</td>
+                <td>Conceptual / Internal (C/I) Mapping</td>
+                <td>Changing disk storage from sequential file to B+ Tree index, or switching hard drives, without modifying SQL queries or table definitions.</td>
+              </tr>
+              <tr>
+                <td><strong>Logical Data Independence (LDI)</strong></td>
+                <td>The ability to modify the logical/conceptual schema (adding new tables, columns, or relationships) without having to rewrite existing external schemas or application programs.</td>
+                <td>External / Conceptual (E/C) Mapping</td>
+                <td>Adding a new column <code>guardian_phone</code> to a Student table without breaking existing applications that only query <code>sid, name, gpa</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 1.4 DBA Duties -->
+      <section id="topic-dba-duties">
+        <h2 class="topic-heading">
+          <span>1.4 Database Administrator (DBA) Major Duties</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে সরাসরি উল্লেখিত: <em>"DBA duty"</em>। পরীক্ষায় সরাসরি ৪ বা ৫ নম্বরের জন্য "List and explain the main functions/duties of a Database Administrator" প্রশ্নটি আসে।</p>
+        </div>
+
+        <div class="definition-block">
+          <div class="def-tag">Formal Definition (Source: 1.1Introduction.pdf, Page 15)</div>
+          <div class="def-text">
+            "A Database Administrator (DBA) is a person or group who coordinates all the activities of the database system; the DBA has a good understanding of the enterprise's information resources and needs."
+          </div>
+        </div>
+
+        <h4 class="section-label">Slide-Mandated 7 Primary Duties of a DBA (Source: 1.1Introduction.pdf, Page 15)</h4>
+        <ol style="margin-left: 20px; color: #cbd5e1; margin-bottom: 16px;">
+          <li style="margin-bottom: 8px;"><strong>Schema Definition:</strong> Creating the original database schema by writing a set of data definition statements in DDL.</li>
+          <li style="margin-bottom: 8px;"><strong>Storage Structure and Access Method Definition:</strong> Determining how data is organized on disk, creating appropriate file structures, indices, and allocation parameters.</li>
+          <li style="margin-bottom: 8px;"><strong>Schema and Physical Organization Modification:</strong> Writing DDL/ALTER commands to alter the logical schema or physical storage organization to adapt to evolving enterprise requirements.</li>
+          <li style="margin-bottom: 8px;"><strong>Granting User Authority to Access the Database:</strong> Managing security privileges and granting authorizations so different users only see and modify data they are permitted to access.</li>
+          <li style="margin-bottom: 8px;"><strong>Specifying Integrity Constraints:</strong> Defining explicit data consistency rules (e.g. primary keys, foreign key relationships, check conditions) within the data dictionary.</li>
+          <li style="margin-bottom: 8px;"><strong>Acting as Liaison with Users:</strong> Consulting with application programmers and organizational end-users to ensure their data needs are met without conflicting with other departments.</li>
+          <li style="margin-bottom: 8px;"><strong>Monitoring Performance and Responding to Changes:</strong> Continuously tuning indexes, memory buffers, and disk layouts to prevent system slowdowns as database size increases.</li>
+        </ol>
+
+        <div class="callout-box callout-memory">
+          <div class="box-title">🧠 MEMORY TRICK — DBA DUTIES</div>
+          <p style="margin:0;">মনে রাখার বাক্য: <strong>"S-S-S-G-I-L-M"</strong><br>
+          <strong>S</strong>chema definition | <strong>S</strong>torage definition | <strong>S</strong>chema modification | <strong>G</strong>ranting authorization | <strong>I</strong>ntegrity constraints | <strong>L</strong>iaison with users | <strong>M</strong>onitoring performance.</p>
+        </div>
+      </section>
+
+      <!-- 1.5 Application Architecture (2-Tier vs 3-Tier) -->
+      <section id="topic-app-architecture">
+        <h2 class="topic-heading">
+          <span>1.5 Application Architectures: Two-Tier vs Three-Tier</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে স্পষ্টভাবে দাগানো: <em>"Application Architecture — or"</em>। ২-টিয়ার বনাম ৩-টিয়ার আর্কিটেকচারের ডায়াগ্রাম এবং তুলনামূলক বিশ্লেষণ প্রতিবার পরীক্ষায় রিপিট হয়।</p>
+        </div>
+
+        <h4 class="section-label">সহজ ভাষায় কনসেপ্ট (Beginner Explanation)</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি জিনিসটা আসলে কী:</strong><br>
+          <strong>Two-tier Architecture:</strong> ক্লায়েন্ট সরাসরি ডেটাবেজের সাথে যোগাযোগ করে। যেমন তোমার পিসিতে ইন্সটল করা কোনো সফটওয়্যার ODBC/JDBC ড্রাইভার দিয়ে সরাসরি রিমোট MySQL ডেটাবেজে কোয়েরি পাঠাচ্ছে। মাঝখানে কোনো মধ্যস্থতাকারী নেই।<br>
+          <strong>Three-tier Architecture:</strong> ক্লায়েন্ট (যেমন ওয়েব ব্রাউজার) সরাসরি ডেটাবেজে হাত দেয় না! ক্লায়েন্ট রিকোয়েস্ট পাঠায় অ্যাপ্লিকেশন সার্ভারে (ওয়েব সার্ভার / ব্যাকএন্ড লজিক)। অ্যাপ্লিকেশন সার্ভার সব বিজনেস রুলস চেক করে ডেটাবেজ সার্ভারের সাথে কথা বলে ডেটা এনে ক্লায়েন্টকে দেয়। আধুনিক ফেসবুক, ইউটিউব, ব্যাংকিং পোর্টাল—সবই Three-tier!
+        </div>
+
+        <!-- Visual Architecture Diagrams -->
+        <div class="diagram-container">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+            <!-- 2-tier -->
+            <div style="background: #090e1a; padding: 18px; border-radius: 8px; border: 1px solid #3b82f6;">
+              <h4 style="color: #60a5fa; margin-bottom: 12px; font-size: 1rem;">(a) Two-Tier Architecture</h4>
+              <svg viewBox="0 0 280 220" style="width: 100%; height: auto; font-family: sans-serif;">
+                <!-- Client box -->
+                <rect x="40" y="20" width="200" height="48" rx="6" fill="#1e293b" stroke="#60a5fa" stroke-width="1.5" />
+                <text x="140" y="42" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">User / Client Program</text>
+                <text x="140" y="58" fill="#94a3b8" font-size="10" text-anchor="middle">(Application Interface + Business Logic)</text>
+
+                <!-- Network Pipe -->
+                <line x1="140" y1="68" x2="140" y2="132" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 2" />
+                <text x="175" y="105" fill="#38bdf8" font-size="10">ODBC / JDBC</text>
+
+                <!-- Server box -->
+                <rect x="40" y="132" width="200" height="52" rx="6" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.5" />
+                <text x="140" y="156" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Database System (Server)</text>
+                <text x="140" y="172" fill="#cbd5e1" font-size="10" text-anchor="middle">(DBMS Engine + Storage)</text>
+              </svg>
+            </div>
+
+            <!-- 3-tier -->
+            <div style="background: #090e1a; padding: 18px; border-radius: 8px; border: 1px solid #8b5cf6;">
+              <h4 style="color: #c084fc; margin-bottom: 12px; font-size: 1rem;">(b) Three-Tier Architecture</h4>
+              <svg viewBox="0 0 280 220" style="width: 100%; height: auto; font-family: sans-serif;">
+                <!-- Client box -->
+                <rect x="40" y="10" width="200" height="42" rx="6" fill="#1e293b" stroke="#60a5fa" stroke-width="1.5" />
+                <text x="140" y="30" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">User / Client (Web Browser)</text>
+                <text x="140" y="44" fill="#94a3b8" font-size="9" text-anchor="middle">Presentation Tier</text>
+
+                <!-- Net 1 -->
+                <line x1="140" y1="52" x2="140" y2="82" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 2" />
+                <text x="170" y="70" fill="#38bdf8" font-size="9">HTTP / HTTPS</text>
+
+                <!-- App Server box -->
+                <rect x="40" y="82" width="200" height="44" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.5" />
+                <text x="140" y="102" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Application Server / Middleware</text>
+                <text x="140" y="117" fill="#a7f3d0" font-size="9" text-anchor="middle">Business Logic Tier</text>
+
+                <!-- Net 2 -->
+                <line x1="140" y1="126" x2="140" y2="156" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 2" />
+                <text x="170" y="144" fill="#10b981" font-size="9">DB Protocol</text>
+
+                <!-- DB box -->
+                <rect x="40" y="156" width="200" height="46" rx="6" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.5" />
+                <text x="140" y="177" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Database System (Server)</text>
+                <text x="140" y="193" fill="#cbd5e1" font-size="9" text-anchor="middle">Data Tier</text>
+              </svg>
+            </div>
+          </div>
+          <div class="diagram-caption">Figure 1.2: Recreated Two-Tier vs Three-Tier Application Architectures (Source: 1.1Introduction.pdf, Page 18)</div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Two-Tier Architecture</th>
+                <th>Three-Tier Architecture</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Tiers / Layers</strong></td>
+                <td>2 Tiers: Client Tier and Database Server Tier.</td>
+                <td>3 Tiers: Presentation (Client), Application (Middleware), Data (DB).</td>
+              </tr>
+              <tr>
+                <td><strong>Where Business Logic Lives</strong></td>
+                <td>Resides on the Client machine (Fat Client).</td>
+                <td>Resides on the central Application Server (Thin Client).</td>
+              </tr>
+              <tr>
+                <td><strong>Database Connection</strong></td>
+                <td>Direct connection between Client and DB via ODBC / JDBC.</td>
+                <td>Indirect; Clients communicate with App Server; App Server manages pooled connections to DB.</td>
+              </tr>
+              <tr>
+                <td><strong>Security</strong></td>
+                <td>Lower; database credentials and logic often reside on client devices.</td>
+                <td>Higher; database is completely shielded behind application firewalls.</td>
+              </tr>
+              <tr>
+                <td><strong>Scalability & Maintenance</strong></td>
+                <td>Poor; updating business logic requires reinstalling software on every client PC.</td>
+                <td>Excellent; business logic updates are deployed only to the central application server.</td>
+              </tr>
+              <tr>
+                <td><strong>Common Use Cases</strong></td>
+                <td>Internal office LAN tools, legacy enterprise systems.</td>
+                <td>Modern web applications, e-commerce, mobile apps, enterprise cloud banking.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 1.6 Overall DBMS System Structure -->
+      <section id="topic-system-structure">
+        <h2 class="topic-heading">
+          <span>1.6 Overall DBMS System Structure</span>
+          <span class="badge-priority badge-yellow">🟡 MEDIUM PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: 1.1Introduction.pdf (Pages 16–17)</div>
+
+        <p>স্লাইডের Figure অনুযায়ী একটি সম্পূর্ণ DBMS আর্কিটেকচার মূলত দুটি প্রধান ভাগে বিভক্ত:</p>
+        <ul style="margin-left: 20px; color: #cbd5e1; margin-bottom: 16px;">
+          <li><strong>1. Query Processor:</strong> ব্যবহারকারী বা অ্যাপ্লিকেশন থেকে আসা কুয়েরি পার্স করা, অনুবাদ করা, অপ্টিমাইজ করা এবং রান করানোর কাজ করে।
+            <ul style="margin-left: 20px; margin-top: 4px;">
+              <li><em>DDL Interpreter:</em> স্কিমা স্টেটমেন্টগুলো এক্সিকিউট করে মেটাডেটা ডেটা ডিকশনারিতে সেভ করে।</li>
+              <li><em>DML Compiler and Organizer:</em> হাই-লেভেল DML কুয়েরিগুলোকে লো-লেভেল এক্সিকিউশন প্ল্যানে রূপান্তর করে।</li>
+              <li><em>Query Evaluation Engine:</em> অপ্টিমাইজড প্ল্যান কার্যকর করে ডেটা বের করে আনে।</li>
+            </ul>
+          </li>
+          <li style="margin-top: 8px;"><strong>2. Storage Manager:</strong> মেমোরি এবং সেকেন্ডারি ডিস্কের মধ্যে ডেটা রিড-রাইট ও ট্রানজাকশন হ্যান্ডেল করে।
+            <ul style="margin-left: 20px; margin-top: 4px;">
+              <li><em>Buffer Manager:</em> ডিস্ক থেকে রমে (RAM) ডেটা পেজ ক্যাশ করে রাখে।</li>
+              <li><em>File Manager:</em> ডিস্কে ব্লক স্পেস ও ফাইল এলোকেশন তদারকি করে।</li>
+              <li><em>Authorization and Integrity Manager:</em> নিরাপত্তা ও কনস্ট্রেইন্ট পরীক্ষা করে।</li>
+              <li><em>Transaction Manager:</em> ক্র্যাশ হলেও ডেটা যাতে কনসিস্টেন্ট থাকে তা নিশ্চিত করে।</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Module 1 Active Recall Test -->
+      <div class="collapsible-wrapper" style="margin-top: 24px;">
+        <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+          <span>🧠 Active Recall Test: Module 01 (Click to Test Yourself!)</span>
+          <span>▼</span>
+        </button>
+        <div class="collapsible-content">
+          <p><strong>1. ফাইল সিস্টেমের প্রধান ৭টি সীমাবদ্ধতা মুখস্থ বলো?</strong></p>
+          <p><strong>2. Physical Level এবং Logical Level-এর মধ্যে মূল পার্থক্য কী? কোনটিতে DBA কাজ করেন?</strong></p>
+          <p><strong>3. Two-tier এবং Three-tier-এর মধ্যে সিকিউরিটি ও মেইনটেন্যান্সে কোনটা সেরা এবং কেন?</strong></p>
+          <p><strong>4. একজন DBA-র যেকোনো ৫টি দায়িত্ব বলো?</strong></p>
+          
+          <div style="margin-top: 16px; border-top: 1px dashed var(--border-color); padding-top: 12px;">
+            <button class="collapsible-trigger" style="background:#090d16; border-radius:6px;" onclick="toggleInnerCollapse(this)">
+              <span>👁️ Show Model Answers</span>
+              <span>▼</span>
+            </button>
+            <div class="collapsible-content" style="background:#060911;">
+              <p><strong>Ans 1:</strong> Redundancy & Inconsistency, Difficulty accessing data, Data isolation, Integrity problems, Atomicity issues, Concurrency anomalies, Security problems.</p>
+              <p><strong>Ans 2:</strong> Physical Level বর্ণনা করে <em>How</em> data is stored (লো-লেভেল ডিস্ক ব্লক ও ইনডেক্স)। Logical Level বর্ণনা করে <em>What</em> data and relationships are stored (টেবিল, ফিল্ড)। DBA কাজ করেন Logical Level-এ।</p>
+              <p><strong>Ans 3:</strong> Three-tier সেরা; কারণ বিজনেস লজিক ক্লায়েন্টে থাকে না, সেন্ট্রাল অ্যাপ সার্ভারে থাকে। ফলে ক্লায়েন্ট সরাসরি ডেটাবেজ অ্যাক্সেস করতে পারে না (উচ্চ সিকিউরিটি) এবং কোনো আপডেট হলে শুধু অ্যাপ সার্ভার আপডেট করলেই চলে।</p>
+              <p><strong>Ans 4:</strong> Schema definition, Storage structure definition, Granting user authorization, Specifying integrity constraints, Monitoring performance.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODULE 02: ER MODELING, KEYS, CONSTRAINTS & REDUCTION
+         ========================================================================== -->
+    <div class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Module 02</div>
+        <h2 class="module-title">ER Modeling, Relational Keys & Schema Reduction</h2>
+        <div class="source-meta">Primary Source: 2nd Chapter-1.pdf (Pages 1–42)</div>
+      </div>
+
+      <!-- 2.1 Strong Entity vs Weak Entity -->
+      <section id="topic-strong-vs-weak">
+        <h2 class="topic-heading">
+          <span>2.1 Strong Entity Set vs Weak Entity Set</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে স্পষ্টভাবে দাগানো: <em>"Strong Entity set vs weak entity set"</em>। প্রতি পরীক্ষায় Weak Entity এর সংজ্ঞা, বৈশিষ্ট্য, Discriminator এবং ER সিম্বল নিয়ে প্রশ্ন থাকে।</p>
+        </div>
+
+        <h4 class="section-label">সহজ ভাষায় কনসেপ্ট (Beginner Explanation)</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি জিনিসটা আসলে কী:</strong><br>
+          <strong>Strong Entity:</strong> যার নিজের একটা নিজস্ব প্রাইমারি কি (Primary Key) আছে। যেমন <code>Student(Roll_no, Name, Age)</code>। এখানে <code>Roll_no</code> দিয়ে যেকোনো স্টুডেন্টকে একদম আলাদাভাবে চেনা যায়। তার অস্তিত্বের জন্য অন্য কারও ওপর নির্ভর করতে হয় না। একে সিঙ্গেল আয়তক্ষেত্র (Rectangle) দিয়ে আঁকা হয়।<br>
+          <strong>Weak Entity:</strong> যার নিজের কোনো প্রাইমারি কি নেই! সে একা একা বাঁচতে পারে না; তার অস্তিত্বের জন্য অন্য একটি স্ট্রং এনটিটির ওপর নির্ভর করতে হয়।<br>
+          <em>বাস্তব উদাহরণ (স্লাইড পেজ ১ ও ২৩):</em> বিল্ডিং না থাকলে রুমের কোনো অস্তিত্ব নেই। পিতা-মাতা ছাড়া সন্তানের কোনো স্বাধীন এন্ট্রি হতে পারে না। একইভাবে, ব্যাংক লোন (<code>loan</code>) না থাকলে লোন পেমেন্ট (<code>payment</code>) এর কোনো অস্তিত্বই থাকতে পারে না! একে ডাবল আয়তক্ষেত্র (Double Rectangle) দিয়ে আঁকা হয়।
+        </div>
+
+        <div class="definition-block">
+          <div class="def-tag">Formal Definition (Source: 2nd Chapter-1.pdf, Page 23)</div>
+          <div class="def-text">
+            "An entity set that does not have a primary key is referred to as a weak entity set. The existence of a weak entity set depends on the existence of an identifying entity set via a total, one-to-many relationship set from the identifying to the weak entity set."
+          </div>
+          <div class="def-keywords">Key Terms: No primary key, Existence dependent, Identifying entity set, Identifying relationship (double diamond), Discriminator (partial key with dashed underline).</div>
+        </div>
+
+        <!-- SVG Diagram: Strong vs Weak Entity -->
+        <div class="diagram-container">
+          <svg viewBox="0 0 650 220" style="max-width: 100%; height: auto; font-family: sans-serif;">
+            <!-- Strong Entity: loan -->
+            <rect x="30" y="80" width="130" height="50" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+            <text x="95" y="110" fill="#fff" font-weight="bold" font-size="14" text-anchor="middle">loan</text>
+            <text x="95" y="148" fill="#94a3b8" font-size="11" text-anchor="middle">(Strong Entity)</text>
+
+            <!-- Attributes of loan -->
+            <ellipse cx="60" cy="30" rx="45" ry="18" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="60" y="34" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle" text-decoration="underline">loan-number</text>
+
+            <ellipse cx="145" cy="30" rx="35" ry="18" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="145" y="34" fill="#cbd5e1" font-size="11" text-anchor="middle">amount</text>
+
+            <line x1="65" y1="48" x2="80" y2="80" stroke="#38bdf8" stroke-width="1.5" />
+            <line x1="135" y1="48" x2="110" y2="80" stroke="#38bdf8" stroke-width="1.5" />
+
+            <!-- Identifying Relationship: loan-payment -->
+            <!-- Outer Diamond -->
+            <polygon points="280,70 330,105 280,140 230,105" fill="#1e1b4b" stroke="#a855f7" stroke-width="2" />
+            <!-- Inner Diamond -->
+            <polygon points="280,76 322,105 280,134 238,105" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.5" />
+            <text x="280" y="109" fill="#e9d5ff" font-size="11" font-weight="bold" text-anchor="middle">loan-payment</text>
+
+            <!-- Line between loan and relationship -->
+            <line x1="160" y1="105" x2="230" y2="105" stroke="#a855f7" stroke-width="2" />
+            <polygon points="160,105 170,100 170,110" fill="#a855f7" />
+
+            <!-- Total participation: Double line between relationship and payment -->
+            <line x1="330" y1="102" x2="430" y2="102" stroke="#ec4899" stroke-width="2" />
+            <line x1="330" y1="108" x2="430" y2="108" stroke="#ec4899" stroke-width="2" />
+
+            <!-- Weak Entity: payment (Double Rectangle) -->
+            <rect x="430" y="80" width="150" height="50" rx="4" fill="#1f1528" stroke="#ec4899" stroke-width="2" />
+            <rect x="436" y="86" width="138" height="38" rx="2" fill="#1f1528" stroke="#ec4899" stroke-width="1.5" />
+            <text x="505" y="110" fill="#fff" font-weight="bold" font-size="14" text-anchor="middle">payment</text>
+            <text x="505" y="148" fill="#f472b6" font-size="11" text-anchor="middle">(Weak Entity Set)</text>
+
+            <!-- Attributes of payment -->
+            <ellipse cx="435" cy="30" rx="52" ry="18" fill="#0f172a" stroke="#ec4899" stroke-width="1.5" />
+            <text x="435" y="34" fill="#f472b6" font-size="10" font-weight="bold" text-anchor="middle" stroke-dasharray="3 2">payment-number</text>
+            <!-- Dashed underline indicator -->
+            <line x1="395" y1="38" x2="475" y2="38" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="3 2" />
+
+            <ellipse cx="530" cy="24" rx="40" ry="16" fill="#0f172a" stroke="#ec4899" stroke-width="1.5" />
+            <text x="530" y="28" fill="#cbd5e1" font-size="10" text-anchor="middle">payment-date</text>
+
+            <ellipse cx="610" cy="30" rx="45" ry="18" fill="#0f172a" stroke="#ec4899" stroke-width="1.5" />
+            <text x="610" y="34" fill="#cbd5e1" font-size="10" text-anchor="middle">payment-amount</text>
+
+            <line x1="445" y1="48" x2="475" y2="80" stroke="#ec4899" stroke-width="1.5" />
+            <line x1="530" y1="40" x2="515" y2="80" stroke="#ec4899" stroke-width="1.5" />
+            <line x1="595" y1="48" x2="555" y2="80" stroke="#ec4899" stroke-width="1.5" />
+          </svg>
+          <div class="diagram-caption">Figure 2.1: Weak Entity Set Representation with Identifying Relationship (Source: 2nd Chapter-1.pdf, Page 23)</div>
+        </div>
+
+        <h4 class="section-label">How to form Primary Key of Weak Entity Set?</h4>
+        <div class="callout-box callout-easy">
+          <div class="box-title">💡 FORMULA FOR WEAK ENTITY PRIMARY KEY</div>
+          <p style="margin:0;">
+            <strong>Primary Key of Weak Entity</strong> = <code>Primary Key of Strong Entity</code> + <code>Discriminator (Partial Key)</code><br>
+            <em>Example:</em> <code>payment</code> টেবিলের প্রাইমারি কি হবে = <strong>(loan_number, payment_number)</strong>।
+          </p>
+        </div>
+
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Strong Entity Set</th>
+                <th>Weak Entity Set</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Primary Key</strong></td>
+                <td>Has its own primary key that uniquely identifies each tuple.</td>
+                <td>Does NOT have its own primary key; has only a discriminator (partial key).</td>
+              </tr>
+              <tr>
+                <td><strong>Dependency</strong></td>
+                <td>Independent existence; does not rely on any other entity.</td>
+                <td>Existence-dependent on a dominant/identifying strong entity.</td>
+              </tr>
+              <tr>
+                <td><strong>ER Representation</strong></td>
+                <td>Single Rectangle. Primary key underlined with a solid line.</td>
+                <td>Double Rectangle. Discriminator underlined with a <strong>dashed line</strong>.</td>
+              </tr>
+              <tr>
+                <td><strong>Relationship Type</strong></td>
+                <td>Connects via standard relationship (single diamond).</td>
+                <td>Connects via <strong>Identifying Relationship</strong> (double diamond).</td>
+              </tr>
+              <tr>
+                <td><strong>Participation</strong></td>
+                <td>Can have either partial or total participation.</td>
+                <td><strong>Always Total Participation</strong> (double line) in identifying relationship.</td>
+              </tr>
+              <tr>
+                <td><strong>Example</strong></td>
+                <td><code>Student(Roll_no)</code>, <code>loan(loan_number)</code>, <code>Customer(customer_id)</code>.</td>
+                <td><code>payment(payment_number)</code>, <code>Address(Locality)</code>, <code>Dependent(dname)</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 2.2 DBMS Keys: Super Key vs Candidate Key -->
+      <section id="topic-er-keys">
+        <h2 class="topic-heading">
+          <span>2.2 DBMS Keys: Super Key vs Candidate Key (CK)</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে স্পষ্টভাবে দাগানো: <em>"Super key vs CK"</em>। পরীক্ষায় "Define Super Key and Candidate Key. Why is Candidate Key called a minimal super key? Explain with an example table" প্রশ্নটি নিয়মিত আসে।</p>
+        </div>
+
+        <h4 class="section-label">সহজ ভাষায় কনসেপ্ট (Beginner Explanation)</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি জিনিসটা আসলে কী:</strong><br>
+          ধরো তোমার ক্লাসের একটা টেবিল আছে যেখানে আছে <code>(Roll_no, Reg_no, Name, Phone)</code>।<br>
+          • <strong>Super Key:</strong> যে ফিল্ড বা ফিল্ডগুলোর কম্বিনেশন দিয়ে একটি সারিকে ইউনিকভাবে চেনা যায়। যেমন: শুধু <code>{Roll_no}</code> ইউনিক। তাহলে <code>{Roll_no, Name}</code>-ও ইউনিক, <code>{Roll_no, Phone, Name}</code>-ও ইউনিক! এগুলো সবই সুপার কি। অর্থাৎ সুপার কি-র মধ্যে বাড়তি বা অপ্রয়োজনীয় (redundant) ফিল্ড থাকতে পারে।<br>
+          • <strong>Candidate Key:</strong> সুপার কি-র মধ্য থেকে যখন সব অপ্রয়োজনীয় বাড়তি ফিল্ড ফেলে দিয়ে শুধুমাত্র <strong>ন্যূনতম (Minimal)</strong> সেটটুকু রাখা হয়, তাকে বলে ক্যান্ডিডেট কি।<br>
+          <em>সহজ কথায়:</em> সব ক্যান্ডিডেট কি-ই সুপার কি, কিন্তু সব সুপার কি ক্যান্ডিডেট কি নয়! (Candidate Key = Minimal Super Key without redundant attributes).
+        </div>
+
+        <div class="definition-block">
+          <div class="def-tag">Formal Definitions (Source: 2nd Chapter-1.pdf, Pages 8, 13)</div>
+          <div class="def-text">
+            <strong>Super Key:</strong> "A super key is a set of one or more attributes that, taken collectively, allows us to identify uniquely a tuple in the relation."<br>
+            <strong>Candidate Key:</strong> "Candidate keys are selected from the set of super keys. A candidate key is a minimal super key with no redundant attributes."
+          </div>
+        </div>
+
+        <h4 class="section-label">Slide-Based Worked Example (Source: 2nd Chapter-1.pdf, Page 13)</h4>
+        <p>লেটস কনসিডার স্লাইডের <code>Employee</code> টেবিলটি:</p>
+        
+        <div class="table-responsive">
+          <table class="academic-table" style="max-width: 600px;">
+            <thead>
+              <tr>
+                <th>Emp_SSN</th>
+                <th>Emp_Number</th>
+                <th>Emp_Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>123456789</td><td>226</td><td>Steve</td></tr>
+              <tr><td>999999321</td><td>227</td><td>Ajeet</td></tr>
+              <tr><td>888997212</td><td>228</td><td>Chaitanya</td></tr>
+              <tr><td>777778888</td><td>229</td><td>Robert</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>উপরের টেবিলে <code>Emp_SSN</code> ইউনিক এবং <code>Emp_Number</code>-ও ইউনিক।</p>
+        <ul style="margin-left: 20px; color: #cbd5e1; margin-bottom: 16px;">
+          <li><strong>Super Keys of this table:</strong>
+            <br><code>{Emp_SSN}</code>, <code>{Emp_Number}</code>, <code>{Emp_SSN, Emp_Number}</code>, <code>{Emp_SSN, Emp_Name}</code>, <code>{Emp_Number, Emp_Name}</code>, <code>{Emp_SSN, Emp_Number, Emp_Name}</code>.
+            <br><em>কারণ:</em> এগুলোর প্রতিটিই টেবিলের প্রতিটি রো-কে এককভাবে শনাক্ত করতে পারে।
+          </li>
+          <li style="margin-top: 8px;"><strong>Candidate Keys:</strong>
+            <br>শুধুমাত্র <strong><code>{Emp_SSN}</code></strong> এবং <strong><code>{Emp_Number}</code></strong>।
+            <br><em>কেন?</em> কারণ <code>{Emp_SSN, Emp_Name}</code> থেকে যদি <code>Emp_Name</code> বাদ দিয়ে দিই, তবুও শুধু <code>Emp_SSN</code> দিয়েই রো চেনা সম্ভব। তাই <code>Emp_Name</code> হলো একটি রিডান্ড্যান্ট (অনর্থক) অ্যাট্রিবিউট। ক্যান্ডিডেট কি-তে কোনো রিডান্ড্যান্ট অ্যাট্রিবিউট থাকতে পারবে না!
+          </li>
+        </ul>
+
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Super Key</th>
+                <th>Candidate Key</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Minimality</strong></td>
+                <td>Not necessarily minimal; may contain redundant attributes.</td>
+                <td><strong>Strictly minimal</strong>; no proper subset is a super key.</td>
+              </tr>
+              <tr>
+                <td><strong>Relationship</strong></td>
+                <td>Superset of Candidate Key.</td>
+                <td>Subset of Super Keys. Every Candidate Key is a Super Key.</td>
+              </tr>
+              <tr>
+                <td><strong>Selection Base</strong></td>
+                <td>Any attribute set capable of unique tuple identification.</td>
+                <td>Selected from super keys by removing unnecessary/redundant fields.</td>
+              </tr>
+              <tr>
+                <td><strong>Role in Table</strong></td>
+                <td>Broad mathematical concept for uniqueness.</td>
+                <td>Eligible candidates from which the <strong>Primary Key</strong> is chosen.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 2.3 Primary Key vs Unique Key -->
+      <section id="topic-pk-vs-unique">
+        <h2 class="topic-heading">
+          <span>2.3 Primary Key vs Unique Key</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে স্পষ্টভাবে দাগানো: <em>"Pk vs unique key"</em>। পরীক্ষায় টেবিল আকারে এদের পার্থক্য চাওয়া হয় এবং NULL এলাও করে কি না তা জিজ্ঞেস করে।</p>
+        </div>
+
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Comparison Dimension</th>
+                <th>Primary Key</th>
+                <th>Unique Key</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Purpose</strong></td>
+                <td>Uniquely identifies each record/tuple in a table and serves as the primary target for foreign key references.</td>
+                <td>Ensures that all values in a specific column or group of columns are distinct from one another.</td>
+              </tr>
+              <tr>
+                <td><strong>NULL Acceptance</strong></td>
+                <td><strong>NEVER accepts NULL values.</strong> (Must be <code>NOT NULL</code> by definition).</td>
+                <td><strong>Accepts NULL values.</strong> (Allows one NULL in standard SQL, or multiple NULLs depending on DB engine).</td>
+              </tr>
+              <tr>
+                <td><strong>Number of Keys per Table</strong></td>
+                <td>A table can have <strong>only ONE</strong> Primary Key.</td>
+                <td>A table can have <strong>multiple</strong> Unique Keys.</td>
+              </tr>
+              <tr>
+                <td><strong>Index Creation</strong></td>
+                <td>Automatically creates a <strong>Clustered Index</strong> by default (physical storage order matches PK).</td>
+                <td>Automatically creates a <strong>Non-Clustered Index</strong>.</td>
+              </tr>
+              <tr>
+                <td><strong>SQL Syntax Example</strong></td>
+                <td><code>id INT PRIMARY KEY</code> or <code>PRIMARY KEY(roll)</code></td>
+                <td><code>email VARCHAR(50) UNIQUE</code> or <code>UNIQUE(phone)</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-box callout-mistake">
+          <div class="box-title">⚠️ COMMON MISTAKE TO AVOID</div>
+          <p style="margin:0;">পরীক্ষায় অনেকে লেখে: "Unique key cannot have NULL". এটি সম্পূর্ণ ভুল! স্লাইডের পেজ ২১ অনুযায়ী: <em>"A primary key is a unique key that also cannot be null, while a unique key enforces uniqueness but allows nulls."</em></p>
+        </div>
+      </section>
+
+      <!-- 2.4 Generalization vs Specialization -->
+      <section id="topic-gen-vs-spec">
+        <h2 class="topic-heading">
+          <span>2.4 Generalization vs Specialization</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে সরাসরি উল্লেখিত: <em>"Generalization vs specialization"</em>। পরীক্ষায় এদের সংজ্ঞা, টপ-ডাউন বনাম বটম-আপ ডিজাইন এবং ISA ট্রায়াঙ্গল ডায়াগ্রাম বাধ্যতামূলক।</p>
+        </div>
+
+        <h4 class="section-label">সহজ ভাষায় কনসেপ্ট (Beginner Explanation)</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি জিনিসটা আসলে কী:</strong><br>
+          • <strong>Specialization (টপ-ডাউন অ্যাপ্রোচ):</strong> একটা বড় সাধারণ এনটিটিকে ভেঙে ছোট ছোট বিশেষায়িত এনটিটিতে রূপান্তর করা। যেমন: ব্যাংকের <code>Person</code> এনটিটিকে ভেঙে আমরা পেলাম <code>Employee</code> এবং <code>Customer</code>। আবার <code>Employee</code>-কে আরও ভেঙে পেলাম <code>Officer</code>, <code>Teller</code>, <code>Secretary</code>। ওপর থেকে নিচে নামছে—তাই এটি Top-Down!<br>
+          • <strong>Generalization (বটম-আপ অ্যাপ্রোচ):</strong> একাধিক এনটিটির কমন বৈশিষ্ট্যগুলো খুঁজে বের করে তাদের ওপর একটা বড় সুপার-ক্লাস তৈরি করা। যেমন: <code>Savings_Account</code> এবং <code>Current_Account</code>-এর কমন বৈশিষ্ট্য মিলিয়ে তৈরি হলো <code>Account</code>। নিচ থেকে ওপরে উঠছে—তাই এটি Bottom-Up!<br>
+          • <strong>Attribute Inheritance:</strong> নিচের স্তরের (Subclass) এনটিটি স্বয়ংক্রিয়ভাবে ওপরের স্তরের (Superclass) সব অ্যাট্রিবিউট পায়। যেমন: <code>Employee</code> স্বয়ংক্রিয়ভাবেই <code>Person</code>-এর <code>name, street, city</code> পেয়ে যায়।
+        </div>
+
+        <!-- SVG Diagram for Generalization/Specialization -->
+        <div class="diagram-container">
+          <svg viewBox="0 0 550 260" style="max-width: 100%; height: auto; font-family: sans-serif;">
+            <!-- Superclass Person -->
+            <rect x="210" y="20" width="130" height="42" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+            <text x="275" y="46" fill="#fff" font-weight="bold" font-size="14" text-anchor="middle">person</text>
+
+            <!-- Attributes of Person -->
+            <text x="275" y="12" fill="#94a3b8" font-size="11" text-anchor="middle">(Attributes: name, street, city)</text>
+
+            <!-- Line from Person to ISA -->
+            <line x1="275" y1="62" x2="275" y2="90" stroke="#a855f7" stroke-width="2" />
+
+            <!-- Inverted Triangle: ISA -->
+            <polygon points="255,90 295,90 275,125" fill="#311042" stroke="#c084fc" stroke-width="2" />
+            <text x="275" y="106" fill="#f3e8ff" font-size="11" font-weight="bold" text-anchor="middle">ISA</text>
+
+            <!-- Lines from ISA to Subclasses -->
+            <line x1="265" y1="115" x2="140" y2="160" stroke="#a855f7" stroke-width="2" />
+            <line x1="285" y1="115" x2="410" y2="160" stroke="#a855f7" stroke-width="2" />
+
+            <!-- Subclass 1: employee -->
+            <rect x="75" y="160" width="130" height="42" rx="6" fill="#0c4a6e" stroke="#0284c7" stroke-width="2" />
+            <text x="140" y="186" fill="#fff" font-weight="bold" font-size="13" text-anchor="middle">employee</text>
+            <text x="140" y="222" fill="#7dd3fc" font-size="10" text-anchor="middle">+ salary (local)</text>
+
+            <!-- Subclass 2: customer -->
+            <rect x="345" y="160" width="130" height="42" rx="6" fill="#064e3b" stroke="#059669" stroke-width="2" />
+            <text x="410" y="186" fill="#fff" font-weight="bold" font-size="13" text-anchor="middle">customer</text>
+            <text x="410" y="222" fill="#6ee7b7" font-size="10" text-anchor="middle">+ credit-rating (local)</text>
+
+            <text x="50" y="105" fill="#38bdf8" font-size="11" font-weight="bold">↓ Specialization (Top-Down)</text>
+            <text x="390" y="105" fill="#34d399" font-size="11" font-weight="bold">↑ Generalization (Bottom-Up)</text>
+          </svg>
+          <div class="diagram-caption">Figure 2.2: ISA Component for Specialization and Generalization (Source: 2nd Chapter-1.pdf, Page 25)</div>
+        </div>
+
+        <h4 class="section-label">Generalization Design Constraints (Source: 2nd Chapter-1.pdf, Page 26)</h4>
+        <ul style="margin-left: 20px; color: #cbd5e1; margin-bottom: 16px;">
+          <li><strong>Disjoint vs Overlapping:</strong>
+            <br>• <em>Disjoint:</em> একজন ব্যক্তি একই সাথে কেবল একটি সাব-এনটিটির সদস্য হতে পারে (যেমন: একজন কর্মকর্তা একই সাথে টেলর ও সেক্রেটারি হতে পারবেন না)। ER ডায়াগ্রামে ISA ট্রায়াঙ্গলের পাশে <code>disjoint</code> লেখা থাকে।
+            <br>• <em>Overlapping:</em> একজন ব্যক্তি একই সাথে একাধিক সাব-এনটিটির সদস্য হতে পারে (যেমন: একজন ব্যক্তি একই ব্যাংকের <code>Employee</code> এবং একই সাথে <code>Customer</code> হতে পারেন)।
+          </li>
+          <li style="margin-top: 8px;"><strong>Completeness Constraint (Total vs Partial):</strong>
+            <br>• <em>Total:</em> হায়ার-লেভেলের প্রতিটি এনটিটিকে অবশ্যই অন্তত একটি লোয়ার-লেভেল এনটিটিতে অন্তর্ভুক্ত হতে হবে (ডাবল লাইন দিয়ে নির্দেশিত)।
+            <br>• <em>Partial:</em> হায়ার-লেভেলের কিছু এনটিটি কোনো লোয়ার-লেভেলে নাও থাকতে পারে (সিঙ্গেল লাইন)।
+          </li>
+        </ul>
+      </section>
+
+      <!-- 2.5 Ternary to Binary (All 3 Slide Examples) -->
+      <section id="topic-ternary-to-binary">
+        <h2 class="topic-heading">
+          <span>2.5 Ternary to Binary Relationship Conversion (The 3 Slide Patterns)</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে লাল কালি দিয়ে বিশেষ গুরুত্ব দেওয়া: <em>"Ternary to Binary (slide এর ৩টি)"</em>। লেকচার স্লাইডের ৩৯, ৪০ এবং ৪১ পাতায় টার্নারি রিলেশনশিপকে বাইনারিতে রূপান্তর করার ৩টি নির্দিষ্ট মডেল দেখানো আছে। পরীক্ষায় ডায়াগ্রামসহ এটি হুবহু আঁকতে আসে!</p>
+        </div>
+
+        <h4 class="section-label">টার্নারি রিলেশনশিপ কী এবং কেন কনভার্ট করতে হয়?</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি জিনিসটা আসলে কী:</strong><br>
+          যখন একটি মাত্র রিলেশনশিপে তিনটি ভিন্ন ভিন্ন এনটিটি যুক্ত থাকে, তখন তাকে বলে <strong>Ternary Relationship (Degree 3)</strong>।<br>
+          <em>সমস্যা:</em> রিলেশনাল ডেটাবেজ ম্যানেজমেন্ট সিস্টেমে (RDBMS) ৩টি এনটিটিকে সরাসরি ২ মাত্রার টেবিলে রূপান্তর করা খুবই জটিল এবং এতে প্রচুর রিডান্ডেন্সি তৈরি হয়। তাই সফটওয়্যার ডিজাইনাররা টার্নারিকে বাইনারিতে (Degree 2) রূপান্তর করে নেন।<br>
+          তোমার স্লাইডে ৩টি বিশেষ প্যাটার্ন শেখানো হয়েছে—চলো ৩টিই নিখুঁতভাবে শিখি:
+        </div>
+
+        <!-- Pattern 1: Slide 39 (Supplier-Part-Project via Weak Entity Supply) -->
+        <h3 class="subtopic-heading">প্যাটার্ন ১: Weak Entity Approach (Slide 39 — Supplier-Part-Project)</h3>
+        <p>স্লাইড ৩৯-এ <code>SUPPLIER</code>, <code>PART</code> এবং <code>PROJECT</code> তিনটি এনটিটি <code>SUPPLY</code> নামক টার্নারি রিলেশনশিপ এবং অ্যাট্রিবিউট <code>Quantity</code> দিয়ে যুক্ত।<br>
+        <strong>রূপান্তরের কৌশল:</strong> রিলেশনশিপ <code>SUPPLY</code>-কে একটি <strong>Weak Entity</strong>-তে রূপান্তর করা হয় এবং ৩টি এনটিটির সাথে ৩টি আলাদা আইডেন্টিফায়িং বাইনারি রিলেশনশিপ (<code>SS</code>, <code>SP</code>, <code>SPJ</code>) তৈরি করা হয়।</p>
+
+        <div class="diagram-container">
+          <svg viewBox="0 0 650 200" style="max-width: 100%; height: auto; font-family: sans-serif;">
+            <!-- SUPPLIER -->
+            <rect x="20" y="80" width="110" height="40" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="75" y="105" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">SUPPLIER</text>
+
+            <!-- SS diamond -->
+            <polygon points="175,80 195,100 175,120 155,100" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.5" />
+            <polygon points="175,84 190,100 175,116 160,100" fill="#1e1b4b" stroke="#a855f7" stroke-width="1" />
+            <text x="175" y="104" fill="#e9d5ff" font-size="10" font-weight="bold" text-anchor="middle">SS</text>
+            <line x1="130" y1="100" x2="155" y2="100" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="140" y="93" fill="#93c5fd" font-size="10">1</text>
+
+            <!-- SUPPLY (Weak Entity - Double Box) -->
+            <rect x="240" y="80" width="120" height="40" rx="4" fill="#1f1528" stroke="#ec4899" stroke-width="2" />
+            <rect x="244" y="84" width="112" height="32" rx="2" fill="#1f1528" stroke="#ec4899" stroke-width="1.5" />
+            <text x="300" y="105" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">SUPPLY</text>
+            <!-- Quantity attribute on SUPPLY -->
+            <ellipse cx="300" cy="40" rx="35" ry="16" fill="#0f172a" stroke="#ec4899" stroke-width="1.5" />
+            <text x="300" y="44" fill="#f472b6" font-size="10" text-anchor="middle">Quantity</text>
+            <line x1="300" y1="56" x2="300" y2="80" stroke="#ec4899" stroke-width="1.5" />
+
+            <!-- Double line between SS and SUPPLY -->
+            <line x1="195" y1="98" x2="240" y2="98" stroke="#ec4899" stroke-width="1.5" />
+            <line x1="195" y1="102" x2="240" y2="102" stroke="#ec4899" stroke-width="1.5" />
+            <text x="215" y="92" fill="#f472b6" font-size="10">N</text>
+
+            <!-- SPJ diamond -->
+            <polygon points="415,80 435,100 415,120 395,100" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.5" />
+            <polygon points="415,84 430,100 415,116 400,100" fill="#1e1b4b" stroke="#a855f7" stroke-width="1" />
+            <text x="415" y="104" fill="#e9d5ff" font-size="10" font-weight="bold" text-anchor="middle">SPJ</text>
+            <!-- Double line between SUPPLY and SPJ -->
+            <line x1="360" y1="98" x2="395" y2="98" stroke="#ec4899" stroke-width="1.5" />
+            <line x1="360" y1="102" x2="395" y2="102" stroke="#ec4899" stroke-width="1.5" />
+            <text x="375" y="92" fill="#f472b6" font-size="10">N</text>
+
+            <!-- PROJECT -->
+            <rect x="475" y="80" width="110" height="40" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="530" y="105" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">PROJECT</text>
+            <line x1="435" y1="100" x2="475" y2="100" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="450" y="93" fill="#93c5fd" font-size="10">1</text>
+
+            <!-- SP diamond down to PART -->
+            <polygon points="300,140 315,155 300,170 285,155" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.5" />
+            <polygon points="300,143 311,155 300,167 289,155" fill="#1e1b4b" stroke="#a855f7" stroke-width="1" />
+            <text x="300" y="158" fill="#e9d5ff" font-size="9" font-weight="bold" text-anchor="middle">SP</text>
+            <line x1="298" y1="120" x2="298" y2="140" stroke="#ec4899" stroke-width="1.5" />
+            <line x1="302" y1="120" x2="302" y2="140" stroke="#ec4899" stroke-width="1.5" />
+            <text x="308" y="132" fill="#f472b6" font-size="9">N</text>
+
+            <!-- PART -->
+            <rect x="250" y="175" width="100" height="22" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="300" y="190" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">PART</text>
+            <line x1="300" y1="170" x2="300" y2="175" stroke="#38bdf8" stroke-width="1.5" />
+          </svg>
+          <div class="diagram-caption">Pattern 1: Ternary Decomposition via Weak Entity Set (Source: 2nd Chapter-1.pdf, Page 39)</div>
+        </div>
+
+        <!-- Pattern 2: Slide 40 (Technician-Project-Notebook) -->
+        <h3 class="subtopic-heading">প্যাটার্ন ২: Binary Decomposition without Loss (Slide 40 — Technician-Project-Notebook)</h3>
+        <p>স্লাইড ৪০-এর নিয়ম: <em>"If each technician can be working on several projects and uses the same notebooks on each project, then we can decompose the 3-ary relationship into a set of binary relationships."</em><br>
+        এখানে ৩টি আলাদা বাইনারি রিলেশনশিপ তৈরি হয়:
+        <code>TECHNICIAN</code> <strong>WORKS_ON</strong> <code>PROJECT</code>, <code>TECHNICIAN</code> <strong>USES</strong> <code>NOTEBOOK</code>, এবং <code>PROJECT</code> <strong>HAS</strong> <code>NOTEBOOK</code>।</p>
+
+        <!-- Pattern 3: Slide 41 (Sales Assistant-Product-Customer via Sale Entity) -->
+        <h3 class="subtopic-heading">প্যাটার্ন ৩: Converting Verb Relationship to a Noun Entity (Slide 41 — Sale Entity)</h3>
+        <div class="bangla-teaching">
+          <strong>স্লাইড ৪১-এর অসাধারণ নিয়ম:</strong><br>
+          টার্নারি রিলেশনশিপে অনেক সময় সরাসরি বাইনারি করলে ডেটা হারিয়ে যায় (Information Loss)। যেমন: <code>Sales Assistant</code> বিক্রি করে <code>Product</code>, আর <code>Customer</code> কেনে <code>Product</code>—এতে বোঝা যায় না <em>কোন অ্যাসিস্ট্যান্ট কোন কাস্টমারের কাছে প্রোডাক্টটি বিক্রি করল</em>!<br>
+          <strong>সমাধান:</strong> রিলেশনশিপ ভার্ব (Verb) <code>sells</code>-কে নাউন (Noun) এনটিটি <strong><code>Sale</code></strong>-এ রূপান্তর করো!<br>
+          তখন ৩টি পরিষ্কার বাইনারি সম্পর্ক দাঁড়ায়:
+          <br>১. <code>Sales Assistant</code> <strong>makes</strong> <code>Sale</code>
+          <br>২. <code>Sale</code> <strong>involves</strong> <code>Product</code>
+          <br>৩. <code>Customer</code> <strong>requests</strong> <code>Sale</code>.
+        </div>
+      </section>
+
+      <!-- 2.6 Reduction of ER to Relational Tables -->
+      <section id="topic-er-to-tables">
+        <h2 class="topic-heading">
+          <span>2.6 Reduction of ER Schema to Relational Tables</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে সরাসরি উল্লেখিত: <em>"ER to table"</em>। একটি ই-আর ডায়াগ্রামের বিভিন্ন কম্পোনেন্ট (Strong Entity, Weak Entity, Composite Attribute, Multivalued Attribute, M:N Relationship) কীভাবে রিলেশনাল টেবিলে ম্যাপ হয় তা প্রতি পরীক্ষায় লিখিত অংশে আসে।</p>
+        </div>
+
+        <h4 class="section-label">Slide-by-Slide Reduction Rules (Source: 2nd Chapter-1.pdf, Pages 32–36)</h4>
+        
+        <div style="margin-bottom: 16px;">
+          <h4 style="color: var(--accent-cyan); font-size: 1.05rem;">নিয়ম ১: Strong Entity Set Reduction (Page 32)</h4>
+          <p>একটি সাধারণ স্ট্রং এনটিটি সেট সরাসরি একটি টেবিলে রূপান্তরিত হয়, যার কলামগুলো হবে এনটিটির সমস্ত সাধারণ অ্যাট্রিবিউট এবং প্রাইমারি কি থাকবে আন্ডারলাইন করা।<br>
+          <em>Example:</em> <code>Customer(customer_id, customer_name, customer_street, customer_city)</code></p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <h4 style="color: var(--accent-cyan); font-size: 1.05rem;">নিয়ম ২: Composite and Multivalued Attributes (Page 33)</h4>
+          <p>• <strong>Composite Attributes:</strong> কম্পোজিট অ্যাট্রিবিউট মূল টেবিলে ভেঙে ফ্ল্যাট (flattened) করা হয়। যেমন <code>name(first_name, last_name)</code> হয়ে যাবে মূল টেবিলে দুটি কলাম: <code>name_first_name</code> এবং <code>name_last_name</code>।<br>
+          • <strong>Multivalued Attribute:</strong> মাল্টিভ্যালুড অ্যাট্রিবিউটের জন্য <strong>সম্পূর্ণ আলাদা একটি নতুন টেবিল</strong> তৈরি করতে হয়! নতুন টেবিলের কলাম হবে: <code>(মূল এনটিটির Primary Key + Multivalued Attribute)</code>।<br>
+          <em>স্লাইড উদাহরণ:</em> <code>Employee</code> এর মাল্টিভ্যালুড অ্যাট্রিবিউট <code>dependent_names</code> এর জন্য টেবিল হবে: <code>employee_dependent_names(employee_id, dname)</code>।</p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <h4 style="color: var(--accent-cyan); font-size: 1.05rem;">নিয়ম ৩: Weak Entity Set Reduction (Page 34)</h4>
+          <p>উইক এনটিটি সেট টেবিলে রূপান্তরের সময় তার নিজস্ব ডিসক্রিমিনেটর ছাড়াও আইডেন্টিফায়িং স্ট্রং এনটিটির প্রাইমারি কি-কে ফরেন কি হিসেবে যুক্ত করতে হয়।<br>
+          <em>স্লাইড উদাহরণ:</em> <code>payment(loan_number, payment_number, payment_date, payment_amount)</code> যেখানে <code>loan_number</code> হলো স্ট্রং এনটিটি <code>loan</code>-এর প্রাইমারি কি।</p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <h4 style="color: var(--accent-cyan); font-size: 1.05rem;">নিয়ম ৪: Relationship Sets Reduction (Pages 34–35)</h4>
+          <p>• <strong>Many-to-Many (M:N):</strong> উভয় এনটিটি সেটের প্রাইমারি কি এবং রিলেশনশিপের বর্ণনামূলক অ্যাট্রিবিউট নিয়ে একটি <strong>আলাদা নতুন টেবিল</strong> গঠিত হয়। যেমন <code>borrower(customer_id, loan_number)</code>।<br>
+          • <strong>One-to-Many (1:M):</strong> কোনো আলাদা টেবিল করার প্রয়োজন নেই (Redundancy পরিহারের জন্য)। "Many" সাইডের টেবিলে "One" সাইডের প্রাইমারি কি-কে <strong>Foreign Key</strong> হিসেবে যোগ করে দিলেই চলে!</p>
+        </div>
+      </section>
+
+      <!-- 2.7 Attributes Classification & Cardinality -->
+      <section id="topic-attributes-cardinality">
+        <h2 class="topic-heading">
+          <span>2.7 Attributes Classification & Mapping Cardinalities</span>
+          <span class="badge-priority badge-green">🟢 LOW PRIORITY / QUICK REVISION</span>
+        </h2>
+        <div class="source-meta">Source: 2nd Chapter-1.pdf (Pages 2, 15–17) | Suggestion Note: "Attribute name -> less important"</div>
+
+        <p>সাজেশনে এই অংশটিকে তুলনামূলক কম গুরুত্বপূর্ণ বলা হলেও বেসিকের জন্য জানা জরুরি:</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 16px 0;">
+          <div style="background: #090e1a; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+            <strong style="color: var(--accent-cyan);">Simple Attribute:</strong> যা অবিভাজ্য ও পারমাণবিক (Atomic)। যেমন: <code>Age</code> বা ১০ ডিজিটের ফোন নম্বর।
+          </div>
+          <div style="background: #090e1a; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+            <strong style="color: var(--accent-cyan);">Composite Attribute:</strong> একাধিক ছোট অ্যাট্রিবিউট নিয়ে গঠিত। যেমন: <code>Name(first_name, last_name)</code>।
+          </div>
+          <div style="background: #090e1a; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+            <strong style="color: var(--accent-cyan);">Derived Attribute:</strong> ফিজিক্যালি সেভ থাকে না, অন্য ফিল্ড থেকে ক্যালকুলেট করা হয় (ড্যাশড ওভাল)। যেমন: <code>DOB</code> থেকে <code>Age</code>।
+          </div>
+          <div style="background: #090e1a; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+            <strong style="color: var(--accent-cyan);">Multivalued:</strong> একাধিক মান থাকতে পারে (ডাবল ওভাল)। যেমন: একাধিক <code>email_address</code> বা <code>phone_no</code>।
+          </div>
+        </div>
+      </section>
+
+      <!-- Module 2 Active Recall Test -->
+      <div class="collapsible-wrapper" style="margin-top: 24px;">
+        <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+          <span>🧠 Active Recall Test: Module 02 (Click to Test Yourself!)</span>
+          <span>▼</span>
+        </button>
+        <div class="collapsible-content">
+          <p><strong>1. Weak Entity-র প্রাইমারি কি কীভাবে গঠিত হয়?</strong></p>
+          <p><strong>2. Super Key এবং Candidate Key এর মধ্যে "রিডান্ড্যান্সি" সংক্রান্ত মূল নিয়মটি কী?</strong></p>
+          <p><strong>3. স্লাইড ৩৯ অনুযায়ী Supplier-Part-Project টার্নারি রিলেশনশিপ কীভাবে বাইনারিতে রূপান্তর করা হয়েছে?</strong></p>
+          <p><strong>4. একটি এনটিটিতে Multivalued Attribute থাকলে রিলেশনাল টেবিলে রূপান্তরের নিয়ম কী?</strong></p>
+
+          <div style="margin-top: 16px; border-top: 1px dashed var(--border-color); padding-top: 12px;">
+            <button class="collapsible-trigger" style="background:#090d16; border-radius:6px;" onclick="toggleInnerCollapse(this)">
+              <span>👁️ Show Model Answers</span>
+              <span>▼</span>
+            </button>
+            <div class="collapsible-content" style="background:#060911;">
+              <p><strong>Ans 1:</strong> Weak Entity-র প্রাইমারি কি = Identifying Strong Entity-র Primary Key + Weak Entity-র Discriminator (Partial Key)।</p>
+              <p><strong>Ans 2:</strong> Super Key-তে অতিরিক্ত অপ্রয়োজনীয় (redundant) অ্যাট্রিবিউট থাকতে পারে; কিন্তু Candidate Key হলো Minimal Super Key—এতে কোনো অপ্রয়োজনীয় অ্যাট্রিবিউট থাকা কঠোরভাবে নিষিদ্ধ।</p>
+              <p><strong>Ans 3:</strong> <code>SUPPLY</code> রিলেশনশিপটিকে একটি Weak Entity সেটে রূপান্তর করা হয়েছে, যা <code>SS</code>, <code>SP</code>, এবং <code>SPJ</code> নামক ৩টি আলাদা আইডেন্টিফায়িং বাইনারি রিলেশনশিপ দিয়ে মূল ৩টি এনটিটির সাথে যুক্ত হয়েছে।</p>
+              <p><strong>Ans 4:</strong> মাল্টিভ্যালুড অ্যাট্রিবিউটের জন্য একটি সম্পূর্ণ আলাদা নতুন টেবিল গঠন করতে হয়, যার কলাম হবে মূল এনটিটির প্রাইমারি কি এবং ওই মাল্টিভ্যালুড অ্যাট্রিবিউটটি।</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODULE 03: RELATIONAL ALGEBRA
+         ========================================================================== -->
+    <div class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Module 03</div>
+        <h2 class="module-title">Relational Algebra Operators & Query Optimization</h2>
+        <div class="source-meta">Primary Source: 3.Relational_Aljebra.pdf (Pages 1–30)</div>
+      </div>
+
+      <!-- 3.1 Selection vs Projection -->
+      <section id="topic-select-vs-project">
+        <h2 class="topic-heading">
+          <span>3.1 Selection (σ) vs Projection (π) Operators</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে সরাসরি প্রশ্ন হিসেবে লিখিত: <em>"Selection vs Projection operator"</em>। পরীক্ষায় এদের প্রতীক, অপারেশনের ধরন (Horizontal vs Vertical), সিনট্যাক্স এবং ডুপ্লিকেট এলিমিনেশন নিয়ে প্রশ্ন থাকবেই।</p>
+        </div>
+
+        <h4 class="section-label">সহজ ভাষায় কনসেপ্ট (Beginner Explanation)</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি জিনিসটা আসলে কী:</strong><br>
+          একটি রিলেশনাল টেবিল তো সারি (Row/Tuple) এবং কলাম (Column/Attribute) দিয়ে তৈরি, তাই না?<br>
+          • <strong>Selection (σ):</strong> তুমি যদি কোনো শর্ত দিয়ে <strong>নির্দিষ্ট কিছু সারি (Rows)</strong> ফিল্টার করে আনতে চাও, তখন ব্যবহার করবে Selection। এটা টেবিলকে আনুভূমিকভাবে কাটে—তাই একে বলে <strong>Horizontal Subset</strong>!<br>
+          • <strong>Projection (π):</strong> তুমি যদি কোনো টেবিলের সব কলাম না চেয়ে <strong>নির্দিষ্ট কিছু কলাম (Columns)</strong> দেখতে চাও, তখন ব্যবহার করবে Projection। এটা টেবিলকে লম্বালম্বিভাবে কাটে—তাই একে বলে <strong>Vertical Subset</strong>!<br>
+          <em>মজার বিষয়:</em> প্রজেকশন করার পর যদি দুটি হুবহু একই রকম রো চলে আসে, রিলেশনাল অ্যালজেব্রা স্বয়ংক্রিয়ভাবে ডুপ্লিকেট রো মুছে দিয়ে ইউনিক রো রাখে!
+        </div>
+
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Feature / Dimension</th>
+                <th>Selection Operator (σ)</th>
+                <th>Projection Operator (π)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Symbol & Notation</strong></td>
+                <td>Greek letter Sigma: <code>σ<sub>predicate</sub>(Relation)</code></td>
+                <td>Greek letter Pi: <code>π<sub>attribute_list</sub>(Relation)</code></td>
+              </tr>
+              <tr>
+                <td><strong>Filtering Plane</strong></td>
+                <td><strong>Horizontal Subset:</strong> Selects a subset of tuples (rows) that satisfy a given selection condition.</td>
+                <td><strong>Vertical Subset:</strong> Selects specified attributes (columns) and eliminates all other unmentioned columns.</td>
+              </tr>
+              <tr>
+                <td><strong>Arity (Number of Columns)</strong></td>
+                <td>Output relation has the <strong>exact same arity/degree</strong> as the input relation.</td>
+                <td>Output relation has arity equal to the number of attributes in the projection list.</td>
+              </tr>
+              <tr>
+                <td><strong>Duplicate Elimination</strong></td>
+                <td>No duplicate removal needed (input was a valid relation of distinct tuples).</td>
+                <td><strong>Automatically eliminates duplicate tuples</strong> resulting from column omission.</td>
+              </tr>
+              <tr>
+                <td><strong>Source Slide Example</strong></td>
+                <td>Select students of Team A: <code>σ<sub>Team='A'</sub>(Student)</code></td>
+                <td>Select only customer name & status: <code>π<sub>CustomerName, Status</sub>(Customers)</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SVG Diagram: Horizontal vs Vertical cut -->
+        <div class="diagram-container">
+          <svg viewBox="0 0 600 200" style="max-width: 100%; height: auto; font-family: sans-serif;">
+            <!-- Table outline Selection -->
+            <rect x="50" y="30" width="200" height="130" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="150" y="20" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">Selection σ (Horizontal Subset)</text>
+            <!-- Rows -->
+            <rect x="55" y="40" width="190" height="24" fill="#1e293b" />
+            <rect x="55" y="70" width="190" height="24" fill="#047857" stroke="#10b981" stroke-width="2" />
+            <text x="150" y="86" fill="#fff" font-size="11" text-anchor="middle">Row satisfies predicate ✓</text>
+            <rect x="55" y="100" width="190" height="24" fill="#1e293b" />
+            <rect x="55" y="130" width="190" height="24" fill="#047857" stroke="#10b981" stroke-width="2" />
+            <text x="150" y="146" fill="#fff" font-size="11" text-anchor="middle">Row satisfies predicate ✓</text>
+
+            <!-- Table outline Projection -->
+            <rect x="350" y="30" width="200" height="130" rx="6" fill="#0f172a" stroke="#a855f7" stroke-width="1.5" />
+            <text x="450" y="20" fill="#a855f7" font-size="12" font-weight="bold" text-anchor="middle">Projection π (Vertical Subset)</text>
+            <!-- Columns -->
+            <rect x="355" y="40" width="40" height="114" fill="#1e293b" />
+            <rect x="400" y="40" width="60" height="114" fill="#6b21a8" stroke="#c084fc" stroke-width="2" />
+            <text x="430" y="100" fill="#fff" font-size="11" text-anchor="middle" transform="rotate(-90 430 100)">Column A</text>
+            <rect x="465" y="40" width="40" height="114" fill="#1e293b" />
+            <rect x="510" y="40" width="35" height="114" fill="#6b21a8" stroke="#c084fc" stroke-width="2" />
+            <text x="527" y="100" fill="#fff" font-size="11" text-anchor="middle" transform="rotate(-90 527 100)">Col B</text>
+          </svg>
+          <div class="diagram-caption">Figure 3.1: Visualizing Selection (Rows/Horizontal) vs Projection (Columns/Vertical)</div>
+        </div>
+      </section>
+
+      <!-- 3.2 Cartesian Product & Rename -->
+      <section id="topic-cartesian-product">
+        <h2 class="topic-heading">
+          <span>3.2 Cartesian Product (×) & Rename (ρ) Operations</span>
+          <span class="badge-priority badge-yellow">🟡 MEDIUM PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: 3.Relational_Aljebra.pdf (Pages 5, 11)</div>
+
+        <p><strong>Cartesian Product ($r \times s$):</strong> যদি রিলেশন $r$-এর ডিগ্রি হয় $p$ এবং টাপল সংখ্যা হয় $n_1$, এবং রিলেশন $s$-এর ডিগ্রি হয় $q$ এবং টাপল সংখ্যা হয় $n_2$; তবে তাদের ক্রস প্রোডাক্ট $r \times s$-এর:<br>
+        • ডিগ্রি (Columns) হবে = $p + q$<br>
+        • কার্ডিনালিটি (Rows) হবে = $n_1 \times n_2$।<br>
+        এটি রিলেশন $r$-এর প্রতিটি টাপলের সাথে রিলেশন $s$-এর প্রতিটি টাপলকে জোড়া লাগিয়ে কনক্যাটেনেশন তৈরি করে।</p>
+
+        <p><strong>Rename Operation ($\rho$):</strong> রিলেশনাল অ্যালজেব্রার এক্সপ্রেশনের ফলাফলকে কোনো নাম দিতে বা একই টেবিলকে নিজের সাথে তুলনা করতে রিনেম অপারেটর ব্যবহৃত হয়।<br>
+        • $\rho_X(E)$ : ফলাফল এক্সপ্রেশন $E$-কে নতুন নাম $X$ দেয়।<br>
+        • $\rho_{X(A_1, A_2, \dots, A_n)}(E)$ : টেবিলের নাম $X$ করার সাথে সাথে তার অ্যাট্রিবিউটগুলোর নাম যথাক্রমে $A_1, A_2, \dots$ এ পরিবর্তন করে।</p>
+      </section>
+
+      <!-- 3.3 Set Operations -->
+      <section id="topic-set-operations">
+        <h2 class="topic-heading">
+          <span>3.3 Set Operations: Union, Difference, and Intersection</span>
+          <span class="badge-priority badge-yellow">🟡 MEDIUM PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: 3.Relational_Aljebra.pdf (Pages 7–16)</div>
+
+        <div class="callout-box callout-important">
+          <div class="box-title">⚡ UNION COMPATIBILITY RULE</div>
+          <p style="margin:0;">Union ($r \cup s$), Intersection ($r \cap s$), এবং Set Difference ($r - s$) করার জন্য দুটি রিলেশনকে অবশ্যই <strong>Union Compatible</strong> হতে হবে। অর্থাৎ:<br>
+          ১. উভয় রিলেশনের অ্যাট্রিবিউট সংখ্যা (Arity) হুবহু সমান হতে হবে।<br>
+          ২. বাম থেকে ডানে সংশ্লিষ্ট অ্যাট্রিবিউটগুলোর ডেটা ডোমেইন (Data Types) কম্প্যাটিবল হতে হবে।</p>
+        </div>
+
+        <p>• <strong>Set Union ($r \cup s$):</strong> উভয় রিলেশনের সমস্ত টাপল অন্তর্ভুক্ত করে কিন্তু কোনো ডুপ্লিকেট পুনরাবৃত্তি হতে দেয় না।<br>
+        • <strong>Set Difference ($r - s$):</strong> যে সমস্ত টাপল $r$-এ আছে কিন্তু $s$-এ নেই, তাদের বের করে।<br>
+        • <strong>Set Intersection ($r \cap s$):</strong> উভয় রিলেশনে উপস্থিত কমন টাপলসমূহ নির্বাচন করে ($r \cap s = r - (r - s)$)।</p>
+      </section>
+
+      <!-- 3.4 Joins -->
+      <section id="topic-joins">
+        <h2 class="topic-heading">
+          <span>3.4 Natural Join (⨝) & Outer Joins (⟕, ⟖, ⟗)</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: 3.Relational_Aljebra.pdf (Pages 15–20)</div>
+
+        <p><strong>Natural Join ($r \bowtie s$):</strong><br>
+        ন্যাচারাল জয়েন হলো দুটি টেবিলের এমন একটি অপারেশন যা:<br>
+        ১. প্রথমে তাদের কার্টেসিয়ান প্রোডাক্ট ($r \times s$) করে,<br>
+        ২. যে সমস্ত অ্যাট্রিবিউট উভয় রিলেশনে কমন আছে তাদের মধ্যে সমতা পরীক্ষা করে ($\sigma_{r.A = s.A}$),<br>
+        ৩. এবং ফলাফলে ডুপ্লিকেট কলাম একবার রেখে অতিরিক্ত কলামটি বাদ দিয়ে প্রজেকশন করে।<br>
+        <code>r ⨝ s = Π<sub>r.A, r.B, r.C, s.E</sub> ( σ<sub>r.B = s.B ∧ r.D = s.D</sub> (r × s) )</code></p>
+
+        <h4 class="section-label">Outer Joins (Avoiding Loss of Information with NULLs)</h4>
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Join Type</th>
+                <th>Notation</th>
+                <th>Behavior with Unmatched Tuples</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Left Outer Join</strong></td>
+                <td><code>r ⟕ s</code></td>
+                <td>Computes natural join and keeps all tuples from the <strong>left</strong> relation $r$, padding right attributes with <code>NULL</code> if no match exists.</td>
+              </tr>
+              <tr>
+                <td><strong>Right Outer Join</strong></td>
+                <td><code>r ⟖ s</code></td>
+                <td>Computes natural join and keeps all tuples from the <strong>right</strong> relation $s$, padding left attributes with <code>NULL</code> if no match exists.</td>
+              </tr>
+              <tr>
+                <td><strong>Full Outer Join</strong></td>
+                <td><code>r ⟗ s</code></td>
+                <td>Preserves all unmatched tuples from <strong>both</strong> relations, padding non-matching sides with <code>NULL</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3.5 Relational Algebra Classic Exam Queries -->
+      <section id="topic-ra-queries">
+        <h2 class="topic-heading">
+          <span>3.5 Classic University Exam Queries (Bank Enterprise)</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT — HIGH PROBABILITY QUERIES</div>
+          <p style="margin:0;">সাজেশনে <em>"Query"</em> অংশের অধীনে এই ব্যাংক স্কিমার কুয়েরিগুলো সবচেয়ে বেশি আসে। নিচের কুয়েরি দুটি পরীক্ষায় হুবহু আসে:</p>
+        </div>
+
+        <!-- Query 1: Perryridge branch -->
+        <h3 class="subtopic-heading">Query 1: Find the names of all customers who have a loan at the Perryridge branch</h3>
+        <p><em>Source: 3.Relational_Aljebra.pdf, Page 10</em></p>
+        <div class="callout-box callout-exam-ans">
+          <div class="box-title">Relational Algebra Expression</div>
+          <p style="font-family: var(--font-mono); font-size: 1.05rem; color: #38bdf8; margin: 4px 0;">
+            Π<sub>customer_name</sub> ( σ<sub>branch_name = "Perryridge" ∧ borrower.loan_number = loan.loan_number</sub> (borrower × loan) )
+          </p>
+          <p style="margin-top: 6px; font-size: 0.9rem; color: #cbd5e1;">
+            অথবা Natural Join ব্যবহার করে আরও সহজ প্রকাশ:<br>
+            <code class="inline-code">Π<sub>customer_name</sub> ( σ<sub>branch_name = "Perryridge"</sub> (borrower ⨝ loan) )</code>
+          </p>
+        </div>
+
+        <!-- Query 2: Largest Account Balance -->
+        <h3 class="subtopic-heading">Query 2: Find the largest account balance in the bank (Without Aggregation)</h3>
+        <p><em>Source: 3.Relational_Aljebra.pdf, Pages 12–14</em></p>
+        <div class="bangla-teaching">
+          <strong>চলো ট্রিকটা বুঝি:</strong><br>
+          রিলেশনাল অ্যালজেব্রায় সরাসরি <code>max()</code> ছাড়া কীভাবে সবচেয়ে বড় ব্যালেন্স বের করব?<br>
+          ১. প্রথমে <code>account</code> টেবিলকে রিনেম করে <code>d</code> বানিয়ে কার্টেসিয়ান প্রোডাক্ট করো: <code>account × ρ<sub>d</sub>(account)</code>।<br>
+          ২. যে সমস্ত রো-তে <code>account.balance < d.balance</code>, তাদের সিলেক্ট করে ব্যালেন্স প্রজেক্ট করো। এর মানে হলো—যেসব ব্যালেন্সের চেয়ে বড় অন্য কোনো ব্যালেন্স আছে, তারা সবাই এই তালিকায় চলে এলো (অর্থাৎ এরা কেউই <strong>লার্জেস্ট নয়</strong>)!<br>
+          ৩. এবার মূল <code>Π<sub>balance</sub>(account)</code> থেকে এই নন-লার্জেস্ট তালিকাটি <strong>Set Difference (-)</strong> করে বিয়োগ করে দাও! ব্যস, অবশিষ্ট থাকবে শুধুমাত্র সবচেয়ে বড় ব্যালেন্সটি!
+        </div>
+
+        <div class="callout-box callout-exam-ans">
+          <div class="box-title">Official Exam Formulation (Must Memorize!)</div>
+          <p style="font-family: var(--font-mono); font-size: 1.05rem; color: #38bdf8; margin: 6px 0;">
+            Π<sub>balance</sub>(account) − Π<sub>account.balance</sub> ( σ<sub>account.balance < d.balance</sub> (account × ρ<sub>d</sub>(account)) )
+          </p>
+        </div>
+      </section>
+
+      <!-- 3.6 Aggregates -->
+      <section id="topic-aggregates">
+        <h2 class="topic-heading">
+          <span>3.6 Aggregate Operations in Relational Algebra</span>
+          <span class="badge-priority badge-yellow">🟡 MEDIUM PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: 3.Relational_Aljebra.pdf (Pages 17–18)</div>
+
+        <p>অ্যাগ্রিগেশন ফাংশন একটি নির্দিষ্ট কলামের সমস্ত মানের ওপর গাণিতিক হিসাব করে একক মান প্রদান করে।<br>
+        সাধারণ ফাংশনসমূহ: <code>avg</code>, <code>min</code>, <code>max</code>, <code>sum</code>, <code>count</code>।<br>
+        <strong>অপারেশন ফরম্যাট:</strong> <code>G<sub>1</sub>, G<sub>2</sub> ... G<sub>n</sub> 𝒢 <sub>F<sub>1</sub>(A<sub>1</sub>), ...</sub> (E)</code><br>
+        <em>স্লাইড উদাহরণ:</em> প্রতিটি শাখার মোট ব্যালেন্স বের করতে:<br>
+        <code class="inline-code">branch_name 𝒢 <sub>sum(balance)</sub> (account)</code></p>
+      </section>
+
+      <!-- Module 3 Active Recall Test -->
+      <div class="collapsible-wrapper" style="margin-top: 24px;">
+        <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+          <span>🧠 Active Recall Test: Module 03 (Click to Test Yourself!)</span>
+          <span>▼</span>
+        </button>
+        <div class="collapsible-content">
+          <p><strong>1. Selection এবং Projection এর মূল পার্থক্য কী? কোনটি ডুপ্লিকেট দূর করে?</strong></p>
+          <p><strong>2. দুইটি টেবিলের মধ্যে Set Union করতে হলে কী শর্ত পূরণ করতে হয়?</strong></p>
+          <p><strong>3. ন্যাচারাল জয়েন (⨝) এবং কার্টেসিয়ান প্রোডাক্ট (×)-এর মধ্যকার সম্পর্কটি কী?</strong></p>
+          <p><strong>4. Largest Balance বের করার গাণিতিক রিলেশনাল এক্সপ্রেশনটি লিখো?</strong></p>
+
+          <div style="margin-top: 16px; border-top: 1px dashed var(--border-color); padding-top: 12px;">
+            <button class="collapsible-trigger" style="background:#090d16; border-radius:6px;" onclick="toggleInnerCollapse(this)">
+              <span>👁️ Show Model Answers</span>
+              <span>▼</span>
+            </button>
+            <div class="collapsible-content" style="background:#060911;">
+              <p><strong>Ans 1:</strong> Selection হলো Horizontal subset (রো ফিল্টার), Projection হলো Vertical subset (কলাম ফিল্টার)। Projection স্বয়ংক্রিয়ভাবে ডুপ্লিকেট টাপল দূর করে।</p>
+              <p><strong>Ans 2:</strong> উভয় রিলেশনকে <em>Union Compatible</em> হতে হবে (কলাম সংখ্যা সমান এবং অনুরূপ কলামের ডোমেইন এক হতে হবে)।</p>
+              <p><strong>Ans 3:</strong> $r \bowtie s = \Pi_{R \cup S} (\sigma_{r.A_1=s.A_1 \wedge \dots} (r \times s))$ অর্থাৎ কার্টেসিয়ান প্রোডাক্টের ওপর সমতার সিলেকশন এবং ডুপ্লিকেট কলাম বাদ দিয়ে প্রজেকশন।</p>
+              <p><strong>Ans 4:</strong> $\Pi_{balance}(account) - \Pi_{account.balance}(\sigma_{account.balance < d.balance}(account \times \rho_d(account)))$</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODULE 04: SQL CONSTRAINTS & TABLE CREATION
+         ========================================================================== -->
+    <div class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Module 04</div>
+        <h2 class="module-title">SQL Table Creation, Integrity Constraints & DDL</h2>
+        <div class="source-meta">Primary Source: Corrected_MySQL.pdf (Pages 1–28)</div>
+      </div>
+
+      <!-- 4.1 SQL Constraints Table Creation -->
+      <section id="topic-sql-constraints">
+        <h2 class="topic-heading">
+          <span>4.1 Table Creation with Primary Key, NOT NULL & CHECK Constraints</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+
+        <div class="callout-box callout-exam-alert">
+          <div class="box-title">🔴 EXAM ALERT</div>
+          <p style="margin:0;">সাজেশনে বাংলা বাক্যে হুবহু লিখিত নির্দেশ: <em>"Contrains use table create -> (Primary key, not null, check constraint) এই ৩টা use করে table এর SQL code"</em>। পরীক্ষায় একটি বাস্তবসম্মত টেবিল তৈরি করে এই ৩টি কনস্ট্রেইন্ট একসাথে প্রয়োগ করে কোড লিখতে হবে!</p>
+        </div>
+
+        <h4 class="section-label">সহজ ভাষায় কনসেপ্ট (Beginner Explanation)</h4>
+        <div class="bangla-teaching">
+          <strong>চলো আগে বুঝি এই ৩টি কনস্ট্রেইন্ট আসলে কী কাজ করে:</strong><br>
+          ১. <strong>PRIMARY KEY:</strong> টেবিলের প্রতিটি সারিকে ইউনিকভাবে শনাক্ত করে। এতে কোনো ডুপ্লিকেট মান ঢুকবে না এবং এটি কখনো ফাঁকা (NULL) হতে পারবে না।<br>
+          ২. <strong>NOT NULL:</strong> ইউজার ডেটা এন্ট্রি করার সময় এই কলামটি কোনোভাবেই ফাঁকা রেখে যেতে পারবে না (বাধ্যতামূলক ফিল্ড)।<br>
+          ৩. <strong>CHECK:</strong> ডেটা ইনপুট নেওয়ার সময় নির্দিষ্ট শর্ত যাচাই করে। যেমন: বয়স ১৮-এর বেশি কি না, একাউন্ট ব্যালেন্স ০-এর বেশি কি না (<code>balance > 0</code>), অথবা একাউন্ট নম্বর ১ থেকে ১০০০০ এর মধ্যে কি না (<code>BETWEEN 1 AND 10000</code>)। শর্ত পূরণ হলে ইনপুট হবে, নইলে ডেটাবেজ এরর দিবে!
+        </div>
+
+        <h4 class="section-label">Standard Exam Model Code (Combining PK, NOT NULL, CHECK)</h4>
+        <p>স্লাইডের উদাহরণ (Corrected_MySQL.pdf, Page 28) অনুযায়ী নিম্নে সম্পূর্ণ প্রফেশনাল SQL DDL কোড উপস্থাপন করা হলো:</p>
+
+        <pre class="code-block"><code>-- Example 1: Bank Account Table using PK, NOT NULL, and multiple CHECK constraints
+CREATE TABLE account (
+    aNumber INT NOT NULL,
+    aHolderName VARCHAR(50) NOT NULL,
+    branch_name VARCHAR(30) NOT NULL,
+    balance DOUBLE NOT NULL,
+    PRIMARY KEY (aNumber),
+    CONSTRAINT chk_aNumber CHECK (aNumber BETWEEN 1 AND 10000),
+    CONSTRAINT chk_aHolderName CHECK (aHolderName LIKE 'A%'),
+    CONSTRAINT chk_balance CHECK (balance > 0)
+);</code></pre>
+
+        <pre class="code-block"><code>-- Example 2: Student Registration Table (University Context)
+CREATE TABLE student (
+    roll INT NOT NULL,
+    stName VARCHAR(40) NOT NULL,
+    age INT NOT NULL,
+    department VARCHAR(20) NOT NULL,
+    fees DOUBLE NOT NULL,
+    PRIMARY KEY (roll),
+    CONSTRAINT chk_student_age CHECK (age >= 17 AND age <= 35),
+    CONSTRAINT chk_fees CHECK (fees >= 0)
+);</code></pre>
+
+        <div class="callout-box callout-exam-ans">
+          <div class="box-title">📝 EXAM CODE BREAKDOWN FOR FULL MARKS</div>
+          <ul style="margin-left: 20px; font-size: 0.92rem; color: #cbd5e1;">
+            <li><code>PRIMARY KEY (aNumber)</code>: নিশ্চিত করে প্রতিটি একাউন্ট নম্বর একক এবং কখনোই ফাঁকা হতে পারবে না।</li>
+            <li><code>aHolderName VARCHAR(50) NOT NULL</code>: নিশ্চিত করে নাম ছাড়া কোনো একাউন্ট খোলা যাবে না।</li>
+            <li><code>CHECK (balance > 0)</code>: নিশ্চিত করে কোনো একাউন্টের ব্যালেন্স শূন্য বা নেগেটিভ হতে পারবে না।</li>
+            <li><code>CHECK (aNumber BETWEEN 1 AND 10000)</code>: একাউন্ট নম্বরের রেঞ্জ ১ থেকে ১০০০০ এর মধ্যে সীমাবদ্ধ রাখে।</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 4.2 Foreign Key & Cascade -->
+      <section id="topic-foreign-keys">
+        <h2 class="topic-heading">
+          <span>4.2 Foreign Key Constraints & ON DELETE CASCADE</span>
+          <span class="badge-priority badge-red">🔴 HIGH PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: Corrected_MySQL.pdf (Pages 25–27)</div>
+
+        <div class="definition-block">
+          <div class="def-tag">Formal Definition & Rules (Source: Corrected_MySQL.pdf, Page 25)</div>
+          <div class="def-text">
+            "A Foreign key constraint is used to create a relationship among different tables. Primary key of one table (Parent/Master) and foreign key of another table (Child) are used to create this relationship."
+          </div>
+        </div>
+
+        <h4 class="section-label">Rules of Foreign Key Constraint (Must Memorize):</h4>
+        <ol style="margin-left: 20px; color: #cbd5e1; margin-bottom: 16px;">
+          <li><strong>Referential Integrity:</strong> If a value does not exist in the master (parent) table, no insert or update operation referencing that value can be performed on the foreign (child) table.</li>
+          <li><strong>ON DELETE CASCADE:</strong> If you specify the <code>ON DELETE CASCADE</code> option, deleting a record from the master table will automatically delete all corresponding child records from the foreign table!</li>
+          <li><strong>Data Type Matching:</strong> The primary key column in the parent table and the foreign key column in the child table must be of the exact same data type and compatible size.</li>
+        </ol>
+
+        <pre class="code-block"><code>-- Creating Parent Table
+CREATE TABLE department (
+    dept_id INT NOT NULL,
+    dept_name VARCHAR(30) NOT NULL,
+    PRIMARY KEY (dept_id)
+);
+
+-- Creating Child Table with FOREIGN KEY and ON DELETE CASCADE
+CREATE TABLE employee (
+    emp_id INT NOT NULL,
+    emp_name VARCHAR(40) NOT NULL,
+    salary DOUBLE NOT NULL CHECK (salary > 0),
+    dept_id INT NOT NULL,
+    PRIMARY KEY (emp_id),
+    FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);</code></pre>
+      </section>
+
+      <!-- 4.3 Essential DDL Commands -->
+      <section id="topic-sql-ddl-dml">
+        <h2 class="topic-heading">
+          <span>4.3 SQL DDL & DML Commands Summary</span>
+          <span class="badge-priority badge-yellow">🟡 MEDIUM PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: Corrected_MySQL.pdf (Pages 6–18)</div>
+
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>SQL Syntax Template</th>
+                <th>Source Example (from Slide)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Add Column</strong></td>
+                <td><code>ALTER TABLE tab_name ADD (col_name datatype);</code></td>
+                <td><code>ALTER TABLE student ADD (deptName varchar(20), hallName varchar(20));</code></td>
+              </tr>
+              <tr>
+                <td><strong>Modify Column</strong></td>
+                <td><code>ALTER TABLE tab_name MODIFY col_name new_type;</code></td>
+                <td><code>ALTER TABLE student MODIFY deptName int(3);</code></td>
+              </tr>
+              <tr>
+                <td><strong>Drop Column</strong></td>
+                <td><code>ALTER TABLE tab_name DROP COLUMN col_name;</code></td>
+                <td><code>ALTER TABLE student DROP COLUMN hallName;</code></td>
+              </tr>
+              <tr>
+                <td><strong>Rename Table</strong></td>
+                <td><code>ALTER TABLE old_name RENAME TO new_name;</code></td>
+                <td><code>ALTER TABLE student RENAME TO student_info;</code></td>
+              </tr>
+              <tr>
+                <td><strong>Create from Existing</strong></td>
+                <td><code>CREATE TABLE new_t AS SELECT * FROM old_t;</code></td>
+                <td><code>CREATE TABLE employee AS SELECT * FROM student;</code></td>
+              </tr>
+              <tr>
+                <td><strong>Drop Table</strong></td>
+                <td><code>DROP TABLE tab_name;</code></td>
+                <td><code>DROP TABLE student;</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4.4 MySQL Data Types Summary -->
+      <section id="topic-mysql-types">
+        <h2 class="topic-heading">
+          <span>4.4 MySQL Data Types Quick Reference</span>
+          <span class="badge-priority badge-green">🟢 LOW PRIORITY</span>
+        </h2>
+        <div class="source-meta">Source: Corrected_MySQL.pdf (Pages 2–5)</div>
+
+        <p>• <strong>Numeric:</strong> <code>INT</code> (-2B to +2B), <code>TINYINT</code> (-128 to 127), <code>SMALLINT</code>, <code>BIGINT</code>, <code>FLOAT(M,D)</code>, <code>DOUBLE(M,D)</code>.<br>
+        • <strong>Date & Time:</strong> <code>DATE</code> (YYYY-MM-DD), <code>DATETIME</code> (YYYY-MM-DD HH:MM:SS), <code>TIMESTAMP</code>, <code>TIME</code>.<br>
+        • <strong>String:</strong> <code>CHAR(M)</code> (Fixed length 1-255), <code>VARCHAR(M)</code> (Variable length), <code>TEXT</code> / <code>BLOB</code> (up to 65,535 chars), <code>ENUM('A','B','C')</code>.</p>
+      </section>
+    </div>
+
+    <!-- ==========================================================================
+         MODULE 05: FINAL EXAM REVISION & RAPID CHEAT SHEET
+         ========================================================================== -->
+    <div id="final-revision" class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Module 05</div>
+        <h2 class="module-title">🚀 Final Exam Revision & 10-Minute Cheat Sheet</h2>
+      </div>
+
+      <div class="bangla-teaching">
+        <strong>পরীক্ষাকেন্দ্রে প্রবেশের আগের মুহূর্তের রিভিশন:</strong><br>
+        নিচে মাত্র ১০ মিনিটে পুরো সিলেবাস এক নজরে রিভাইজ দেওয়ার জন্য অত্যাবশ্যকীয় পয়েন্ট, সংজ্ঞা এবং পার্থক্যগুলো গুছিয়ে দেওয়া হলো।
+      </div>
+
+      <h3 class="subtopic-heading">1. Must-Memorize Definitions</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin: 16px 0;">
+        <div style="background: #090e1a; padding: 14px; border-radius: 6px; border-left: 3px solid var(--accent-blue);">
+          <strong>DBMS:</strong> Interrelated data collection + software programs to access data conveniently and efficiently.
+        </div>
+        <div style="background: #090e1a; padding: 14px; border-radius: 6px; border-left: 3px solid var(--accent-purple);">
+          <strong>Weak Entity Set:</strong> An entity set lacking a primary key, existence-dependent on an identifying strong entity via an identifying relationship.
+        </div>
+        <div style="background: #090e1a; padding: 14px; border-radius: 6px; border-left: 3px solid var(--accent-green);">
+          <strong>Candidate Key:</strong> A minimal super key having no redundant attributes, capable of uniquely identifying every tuple.
+        </div>
+        <div style="background: #090e1a; padding: 14px; border-radius: 6px; border-left: 3px solid var(--accent-yellow);">
+          <strong>Selection (σ):</strong> Unary operator producing a horizontal subset of tuples satisfying a given predicate.
+        </div>
+        <div style="background: #090e1a; padding: 14px; border-radius: 6px; border-left: 3px solid var(--accent-cyan);">
+          <strong>Projection (π):</strong> Unary operator producing a vertical subset of specified attributes with automatic duplicate tuple removal.
+        </div>
+        <div style="background: #090e1a; padding: 14px; border-radius: 6px; border-left: 3px solid var(--accent-red);">
+          <strong>Specialization:</strong> Top-down design designating distinctive lower-level entity sets with inherited attributes via ISA component.
+        </div>
+      </div>
+
+      <h3 class="subtopic-heading">2. High-Yield Differences in 1 Line</h3>
+      <ul style="margin-left: 20px; color: #cbd5e1; margin-bottom: 20px;">
+        <li><strong>Primary Key vs Unique Key:</strong> PK cannot accept any NULL and only 1 per table; Unique Key accepts NULL and multiple are allowed.</li>
+        <li><strong>Super Key vs Candidate Key:</strong> Super Key may contain redundant columns; Candidate Key is strictly minimal with zero redundancy.</li>
+        <li><strong>Strong vs Weak Entity:</strong> Strong entity has a PK (single rectangle); Weak entity has only a partial key/discriminator (double rectangle).</li>
+        <li><strong>2-Tier vs 3-Tier:</strong> 2-Tier connects client directly to DB via ODBC/JDBC; 3-Tier routes requests through an intermediate Application Server.</li>
+        <li><strong>Selection vs Projection:</strong> Selection filters rows (horizontal); Projection filters columns and eliminates duplicates (vertical).</li>
+        <li><strong>Specialization vs Generalization:</strong> Specialization is top-down; Generalization is bottom-up.</li>
+      </ul>
+
+      <h3 class="subtopic-heading">3. Rapid-Fire 10-Minute Formula & Symbol Sheet</h3>
+      <div class="table-responsive">
+        <table class="academic-table">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Symbol / Syntax</th>
+              <th>Key Note / Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Selection</td>
+              <td><code>σ<sub>condition</sub>(Relation)</code></td>
+              <td>Horizontal row filter.</td>
+            </tr>
+            <tr>
+              <td>Projection</td>
+              <td><code>π<sub>A1, A2</sub>(Relation)</code></td>
+              <td>Vertical column filter + auto duplicate removal.</td>
+            </tr>
+            <tr>
+              <td>Cartesian Product</td>
+              <td><code>r × s</code></td>
+              <td>Arity = $p+q$, Tuples = $n_1 \times n_2$.</td>
+            </tr>
+            <tr>
+              <td>Natural Join</td>
+              <td><code>r ⨝ s</code></td>
+              <td>Equality on common attributes + deduplicate columns.</td>
+            </tr>
+            <tr>
+              <td>Left Outer Join</td>
+              <td><code>r ⟕ s</code></td>
+              <td>Retains all left tuples, fills unshared right with NULL.</td>
+            </tr>
+            <tr>
+              <td>Rename</td>
+              <td><code>ρ<sub>X</sub>(E)</code> or <code>ρ<sub>X(A1,A2)</sub>(E)</code></td>
+              <td>Assigns alias name and renames attributes.</td>
+            </tr>
+            <tr>
+              <td>Set Difference</td>
+              <td><code>r − s</code></td>
+              <td>Tuples present in $r$ but strictly NOT in $s$.</td>
+            </tr>
+            <tr>
+              <td>Weak Entity Key</td>
+              <td><code>PK(Strong) + Partial_Key</code></td>
+              <td>Discriminator underlined with dashed line.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODULE 06: COMPREHENSIVE UNIVERSITY MOCK EXAM
+         ========================================================================== -->
+    <div id="mock-exam" class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Self-Assessment Examination</div>
+        <h2 class="module-title">📝 Comprehensive University DBMS Mock Exam</h2>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Time: 3 Hours | Total Marks: 100 | Based Strictly on Uploaded PDFs & Suggestion</p>
+      </div>
+
+      <div style="background: #090d16; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+        <h3 style="color: var(--accent-blue); margin-bottom: 12px;">Section A: Very Short Answer Questions (10 × 2 = 20 Marks)</h3>
+        <ol style="margin-left: 20px; color: #cbd5e1; line-height: 1.8;">
+          <li>State the formal definition of a Database Management System (DBMS).</li>
+          <li>Why is atomicity critical in fund transfer transactions?</li>
+          <li>What is the difference between a Database Instance and a Database Schema?</li>
+          <li>Define Physical Data Independence and state which mapping provides it.</li>
+          <li>How is a Weak Entity Set represented in an ER diagram?</li>
+          <li>Why is a Candidate Key called a "minimal super key"?</li>
+          <li>What is a Discriminator (Partial Key)? Give an example.</li>
+          <li>Differentiate between Horizontal Subset and Vertical Subset in Relational Algebra.</li>
+          <li>What happens when a record is deleted from a parent table configured with <code>ON DELETE CASCADE</code>?</li>
+          <li>Give the relational algebra expression for Left Outer Join.</li>
+        </ol>
+      </div>
+
+      <div style="background: #090d16; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+        <h3 style="color: var(--accent-purple); margin-bottom: 12px;">Section B: Short Analytical Questions (4 × 5 = 20 Marks)</h3>
+        <ol style="margin-left: 20px; color: #cbd5e1; line-height: 1.8;" start="11">
+          <li>Explain the 7 major drawbacks of traditional File Processing Systems compared to a DBMS.</li>
+          <li>Differentiate between Primary Key and Unique Key with respect to NULL values, index creation, and multiplicity.</li>
+          <li>Describe the 3 levels of data abstraction with an appropriate architectural diagram.</li>
+          <li>Explain Generalization vs Specialization. What are Disjoint and Overlapping constraints?</li>
+        </ol>
+      </div>
+
+      <div style="background: #090d16; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+        <h3 style="color: var(--accent-green); margin-bottom: 12px;">Section C: SQL Design & Integrity Constraints (2 × 10 = 20 Marks)</h3>
+        <ol style="margin-left: 20px; color: #cbd5e1; line-height: 1.8;" start="15">
+          <li>Write an SQL DDL statement to create a table named <code>account</code> that incorporates a Primary Key, a NOT NULL constraint, and CHECK constraints enforcing that account numbers are between 1 and 10000, holder name begins with 'A', and balance is strictly greater than 0. Explain each constraint.</li>
+          <li>Explain the rules of Foreign Key constraints. Write the SQL code to create a parent table <code>department</code> and a child table <code>employee</code> linking them via foreign key with <code>ON DELETE CASCADE</code>.</li>
+        </ol>
+      </div>
+
+      <div style="background: #090d16; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+        <h3 style="color: var(--accent-yellow); margin-bottom: 12px;">Section D: Relational Algebra Query Formulation (2 × 10 = 20 Marks)</h3>
+        <p style="color: var(--accent-cyan); font-size: 0.9rem; margin-bottom: 8px;">Consider the standard Banking Schema from lecture slides: <code>borrower(customer_name, loan_number)</code>, <code>loan(loan_number, branch_name, amount)</code>, <code>depositor(customer_name, account_number)</code>, <code>account(account_number, branch_name, balance)</code>.</p>
+        <ol style="margin-left: 20px; color: #cbd5e1; line-height: 1.8;" start="17">
+          <li>Write Relational Algebra expressions for:
+            <br>(a) Find the names of all customers who have a loan at the "Perryridge" branch.
+            <br>(b) Find the names of all customers who have both a loan and an account at the bank.
+            <br>(c) Find all customers who have an account but NOT a loan.
+          </li>
+          <li>Formulate the Relational Algebra expression to find the largest account balance in the bank WITHOUT using aggregate functions. Explain step-by-step how the set difference operation yields the maximum value.</li>
+        </ol>
+      </div>
+
+      <div style="background: #090d16; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <h3 style="color: var(--accent-red); margin-bottom: 12px;">Section E: ER Design & Decomposition (2 × 10 = 20 Marks)</h3>
+        <ol style="margin-left: 20px; color: #cbd5e1; line-height: 1.8;" start="19">
+          <li>Describe in detail the 3 patterns for converting Ternary Relationships into Binary Relationships as presented in the lecture slides (Slide 39: Weak Entity approach; Slide 40: Binary decomposition; Slide 41: Converting verb relationship to a noun entity). Draw the diagrams for each.</li>
+          <li>Explain the step-by-step reduction rules to convert an ER Diagram into Relational Tables for:
+            <br>(a) Strong Entity Sets
+            <br>(b) Weak Entity Sets
+            <br>(c) Composite and Multivalued Attributes
+            <br>(d) Many-to-Many vs One-to-Many Relationships.
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODEL ANSWER KEY FOR MOCK EXAM
+         ========================================================================== -->
+    <div id="mock-answers" class="academic-card">
+      <div class="module-header">
+        <div class="module-tag">Grading & Benchmark Solutions</div>
+        <h2 class="module-title">🏆 Comprehensive Model Answer Key with Marking Breakdown</h2>
+      </div>
+
+      <div class="collapsible-wrapper">
+        <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+          <span>👁️ Reveal Section A Model Answers (Very Short Questions)</span>
+          <span>▼</span>
+        </button>
+        <div class="collapsible-content">
+          <p><strong>1. DBMS Definition (2 Marks):</strong> A Database Management System is a collection of interrelated data and a set of programs to access that data in a convenient and efficient manner (Source: 1.1Introduction.pdf, p. 2).</p>
+          <p><strong>2. Atomicity in Fund Transfer (2 Marks):</strong> Atomicity ensures an "all-or-nothing" execution. In fund transfer, money deducted from Account A must either be deposited in Account B or refunded if a system failure occurs midway, preventing partial updates.</p>
+          <p><strong>3. Instance vs Schema (2 Marks):</strong> A <em>Schema</em> is the overall design/structure of the database (rarely changes), while an <em>Instance</em> is the actual collection of data stored in the database at a particular moment in time.</p>
+          <p><strong>4. Physical Data Independence (2 Marks):</strong> The ability to modify the physical schema (storage structures, indexing) without altering the logical/conceptual schema. Provided by Conceptual/Internal (C/I) Mapping.</p>
+          <p><strong>5. Weak Entity ER Representation (2 Marks):</strong> Represented by a <strong>double rectangle</strong>. Its identifying relationship is a <strong>double diamond</strong>, and its partial key/discriminator is underlined with a <strong>dashed line</strong>.</p>
+          <p><strong>6. Why Minimal Super Key (2 Marks):</strong> Because removing even one single attribute from a candidate key destroys its ability to uniquely identify a tuple.</p>
+          <p><strong>7. Discriminator / Partial Key (2 Marks):</strong> The set of attributes of a weak entity set that distinguishes among all entities within that weak entity set belonging to the same strong entity (e.g. <code>payment_number</code> in <code>payment</code>).</p>
+          <p><strong>8. Horizontal vs Vertical Subset (2 Marks):</strong> Selection (σ) is a horizontal subset filtering rows/tuples; Projection (π) is a vertical subset extracting specified columns and eliminating duplicates.</p>
+          <p><strong>9. ON DELETE CASCADE Effect (2 Marks):</strong> Deleting a parent row automatically triggers the DBMS to delete all child records that reference that parent record's primary key.</p>
+          <p><strong>10. Left Outer Join Expression (2 Marks):</strong> <code>r ⟕ s = (r ⨝ s) ∪ ((r − π<sub>R</sub>(r ⨝ s)) × {(null, ..., null)})</code>.</p>
+        </div>
+      </div>
+
+      <div class="collapsible-wrapper">
+        <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+          <span>👁️ Reveal Section B Model Answers (Short Analytical Questions)</span>
+          <span>▼</span>
+        </button>
+        <div class="collapsible-content">
+          <p><strong>11. Drawbacks of File Systems (5 Marks):</strong> Full marks awarded for listing and detailing all 7 points: Data Redundancy & Inconsistency, Difficulty Accessing Data, Data Isolation, Integrity Problems, Atomicity of Updates, Concurrent Access Anomalies, and Security Problems with appropriate explanations as taught in Module 1.1.</p>
+          <p><strong>12. PK vs Unique Key (5 Marks):</strong> Awarded for presenting a 3-point contrast: (1) PK does not permit any NULL; Unique Key permits NULL values. (2) Only one PK per table; multiple Unique Keys allowed. (3) PK creates clustered index; Unique Key creates non-clustered index.</p>
+          <p><strong>13. 3 Levels of Abstraction (5 Marks):</strong> Clear description of Physical ("how"), Logical ("what"), and View ("subsets/security") with the recreated 3-tier box diagram from Figure 1.1.</p>
+          <p><strong>14. Generalization vs Specialization (5 Marks):</strong> Top-down (Specialization) vs Bottom-up (Generalization), ISA component with attribute inheritance, Disjoint (member of at most one subclass) vs Overlapping (member of multiple subclasses), Total vs Partial completeness.</p>
+        </div>
+      </div>
+
+      <div class="collapsible-wrapper">
+        <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+          <span>👁️ Reveal Section C Model Answers (SQL & Constraints)</span>
+          <span>▼</span>
+        </button>
+        <div class="collapsible-content">
+          <p><strong>15. SQL Table with PK, NOT NULL, CHECK (10 Marks):</strong></p>
+          <pre class="code-block"><code>CREATE TABLE account (
+    aNumber INT NOT NULL,
+    aHolderName VARCHAR(50) NOT NULL,
+    balance DOUBLE NOT NULL,
+    PRIMARY KEY (aNumber),
+    CONSTRAINT chk_aNumber CHECK (aNumber BETWEEN 1 AND 10000),
+    CONSTRAINT chk_aHolderName CHECK (aHolderName LIKE 'A%'),
+    CONSTRAINT chk_balance CHECK (balance > 0)
+);</code></pre>
+          <p><em>Grading:</em> 4 marks for syntax accuracy, 2 marks for PK definition, 2 marks for NOT NULL, 2 marks for CHECK constraints logic.</p>
+
+          <p><strong>16. Foreign Key & ON DELETE CASCADE (10 Marks):</strong></p>
+          <pre class="code-block"><code>CREATE TABLE department (
+    dept_id INT NOT NULL PRIMARY KEY,
+    dept_name VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE employee (
+    emp_id INT NOT NULL PRIMARY KEY,
+    emp_name VARCHAR(40) NOT NULL,
+    dept_id INT NOT NULL,
+    FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+        ON DELETE CASCADE
+);</code></pre>
+          <p>Rules explained: Referential integrity checks, matching data types, and cascading deletions.</p>
+        </div>
+      </div>
+
+      <div class="collapsible-wrapper">
+        <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+          <span>👁️ Reveal Section D Model Answers (Relational Algebra)</span>
+          <span>▼</span>
+        </button>
+        <div class="collapsible-content">
+          <p><strong>17. Relational Algebra Queries (10 Marks):</strong><br>
+          (a) <code>Π<sub>customer_name</sub> ( σ<sub>branch_name = "Perryridge"</sub> (borrower ⨝ loan) )</code><br>
+          (b) <code>Π<sub>customer_name</sub>(borrower) ∩ Π<sub>customer_name</sub>(depositor)</code><br>
+          (c) <code>Π<sub>customer_name</sub>(depositor) − Π<sub>customer_name</sub>(borrower)</code></p>
+
+          <p><strong>18. Largest Balance Query (10 Marks):</strong><br>
+          Expression:<br>
+          <code>Π<sub>balance</sub>(account) − Π<sub>account.balance</sub> ( σ<sub>account.balance < d.balance</sub> (account × ρ<sub>d</sub>(account)) )</code><br>
+          <em>Step Explanation:</em> (1) <code>account × ρ<sub>d</sub>(account)</code> pairs every balance with every other balance. (2) <code>σ<sub>account.balance < d.balance</sub></code> finds all balances that are strictly smaller than at least one other balance (thus eliminating the maximum balance). (3) Projecting these gives all non-maximum balances. (4) Set difference removes all non-maximum balances from the universe of balances, leaving exclusively the maximum balance.</p>
+        </div>
+      </div>
+
+      <div class="collapsible-wrapper">
+        <button class="collapsible-trigger" onclick="toggleCollapse(this)">
+          <span>👁️ Reveal Section E Model Answers (ER Design & Decomposition)</span>
+          <span>▼</span>
+        </button>
+        <div class="collapsible-content">
+          <p><strong>19. Ternary to Binary (10 Marks):</strong> Full marks for drawing and explaining: (1) Weak Entity approach (Supply linking SS, SP, SPJ to Supplier, Part, Project from Slide 39); (2) Pure Binary decomposition when technician uses same notebooks on each project (Slide 40); (3) Converting verb 'sells' into noun entity 'Sale' to prevent information loss between Sales Assistant, Customer, and Product (Slide 41).</p>
+          <p><strong>20. ER to Relational Tables Reduction (10 Marks):</strong> Strong entity -> table with all simple attributes; Weak entity -> table with discriminator + parent primary key; Composite attributes -> flattened into individual fields; Multivalued attributes -> separate dedicated table with parent PK; Many-to-Many -> dedicated relationship table with both PKs; One-to-Many -> foreign key added to the table on the "many" side.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: 60px;">
+      DBMS Complete Interactive University Exam Study Course • Synchronized Sidebar & Dynamic Progress Tracking
+    </footer>
+  </main>
+</div>
+
+<!-- BACK TO TOP BUTTON -->
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+
+<script>
+  // Mobile Hamburger Menu Toggle
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const sidebar = document.getElementById('sidebar');
+
+  if (mobileBtn && sidebar) {
+    mobileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle('mobile-open');
+    });
+
+    // Close mobile menu when link is clicked
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && e.target !== mobileBtn) {
+        sidebar.classList.remove('mobile-open');
+      }
+    });
+  }
+
+  // Collapsible Sections
+  function toggleCollapse(btn) {
+    const content = btn.nextElementSibling;
+    const arrow = btn.querySelector('span:last-child');
+    if (content.classList.contains('open')) {
+      content.classList.remove('open');
+      arrow.textContent = '▼';
+    } else {
+      content.classList.add('open');
+      arrow.textContent = '▲';
+    }
+  }
+
+  function toggleInnerCollapse(btn) {
+    const content = btn.nextElementSibling;
+    const arrow = btn.querySelector('span:last-child');
+    if (content.classList.contains('open')) {
+      content.classList.remove('open');
+      arrow.textContent = '▼';
+    } else {
+      content.classList.add('open');
+      arrow.textContent = '▲';
+    }
+  }
+
+  // Interactive Checklist Persistence via localStorage
+  function saveChecklist() {
+    const checkboxes = document.querySelectorAll('#checklist-container input[type="checkbox"]');
+    const state = {};
+    checkboxes.forEach(cb => {
+      state[cb.id] = cb.checked;
+    });
+    try {
+      localStorage.setItem('dbms_exam_prep_checklist', JSON.stringify(state));
+    } catch(e) {}
+  }
+
+  function loadChecklist() {
+    try {
+      const saved = localStorage.getItem('dbms_exam_prep_checklist');
+      if (saved) {
+        const state = JSON.parse(saved);
+        for (const id in state) {
+          const el = document.getElementById(id);
+          if (el) el.checked = state[id];
+        }
+      }
+    } catch(e) {}
+  }
+
+  // Live Search Filter
+  const searchInput = document.getElementById('topic-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      const sections = document.querySelectorAll('section[id], .checklist-item, .academic-card[id]');
+      
+      sections.forEach(sec => {
+        if (!term) {
+          sec.style.display = '';
+          return;
+        }
+        const text = sec.textContent.toLowerCase();
+        if (text.includes(term)) {
+          sec.style.display = '';
+        } else {
+          sec.style.display = 'none';
+        }
+.display = '';
+        } else {
+          sec.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Back to Top Button
+  const btt = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      btt.style.display = 'flex';
+    } else {
+      btt.style.display = 'none';
+    }
+  });
+
+  // =========================================================================
+  // ROBUST SCROLL-SPY & SIDEBAR SYNCHRONIZATION
+  // =========================================================================
+  const navLinks = Array.from(document.querySelectorAll('#sidebar .nav-link'));
+  
+  // Extract target DOM elements matching each sidebar link href
+  const targets = navLinks.map(link => {
+    const href = link.getAttribute('href');
+    if (href && href.startsWith('#')) {
+      const targetId = href.substring(1);
+      const targetElem = document.getElementById(targetId);
+      return { id: targetId, elem: targetElem, link: link };
+    }
+    return null;
+  }).filter(item => item && item.elem);
+
+  let isManualClick = false;
+
+  // Add smooth scroll click handling and direct active state assignment
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        const target = document.getElementById(href.substring(1));
+        if (target) {
+          isManualClick = true;
+          navLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+
+          setTimeout(() => {
+            isManualClick = false;
+          }, 800);
+        }
+      }
+    });
+  });
+
+  function updateSidebarSync() {
+    if (isManualClick) return;
+
+    const scrollY = window.scrollY || window.pageYOffset;
+    // Offset for triggering threshold
+    const triggerPoint = scrollY + 160;
+
+    let currentActiveItem = null;
+
+    // Traverse targets from top to bottom
+    for (let i = 0; i < targets.length; i++) {
+      const target = targets[i];
+      // Accurate viewport-independent document top calculation
+      const rect = target.elem.getBoundingClientRect();
+      const elemTop = rect.top + scrollY;
+
+      if (triggerPoint >= elemTop) {
+        currentActiveItem = target;
+      }
+    }
+
+    // Default to first target if right at top
+    if (!currentActiveItem && targets.length > 0) {
+      currentActiveItem = targets[0];
+    }
+
+    // Update active class and auto-scroll sidebar to keep active item in view
+    targets.forEach(item => {
+      if (currentActiveItem && item.id === currentActiveItem.id) {
+        if (!item.link.classList.contains('active')) {
+          item.link.classList.add('active');
+          
+          // Smoothly scroll sidebar to keep current active link visible
+          item.link.scrollIntoView({
+            block: 'nearest',
+            inline: 'nearest',
+            behavior: 'smooth'
+          });
+        }
